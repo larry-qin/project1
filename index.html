@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Doe - Personal Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>John Doe</h1>
+            </div>
+            <div class="nav-container">
+                <ul class="nav-links">
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="skills.html">Skills</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="theme-switcher">
+                    <button id="theme-toggle" class="theme-btn">🎨</button>
+                    <div id="theme-menu" class="theme-menu">
+                        <div class="theme-option" data-theme="dark">Dark</div>
+                        <div class="theme-option" data-theme="blue">Ocean</div>
+                        <div class="theme-option" data-theme="purple">Sunset</div>
+                        <div class="theme-option" data-theme="green">Forest</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content animate-on-scroll">
+                <h2>Hi, I'm John Doe</h2>
+                <p>Full-Stack Developer & Creative Problem Solver passionate about building amazing digital experiences.</p>
+                <div class="cta-buttons">
+                    <a href="projects.html" class="cta-button">View My Work</a>
+                    <a href="contact.html" class="cta-button secondary">Get In Touch</a>
+                </div>
+            </div>
+            <div class="scroll-indicator animate-on-scroll">
+                <div class="scroll-arrow">↓</div>
+                <span>Scroll to explore</span>
+            </div>
+        </section>
+
+        <section class="preview-section animate-on-scroll">
+            <div class="container">
+                <h2>What I Do</h2>
+                <div class="preview-grid">
+                    <div class="preview-card">
+                        <div class="preview-icon">👨‍💻</div>
+                        <h3>About Me</h3>
+                        <p>Learn about my journey, experience, and what drives me as a developer.</p>
+                        <a href="about.html" class="preview-link">Learn More →</a>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-icon">🛠️</div>
+                        <h3>My Skills</h3>
+                        <p>Discover the technologies and tools I use to bring ideas to life.</p>
+                        <a href="skills.html" class="preview-link">View Skills →</a>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-icon">🚀</div>
+                        <h3>Projects</h3>
+                        <p>Explore the projects I've built and problems I've solved.</p>
+                        <a href="projects.html" class="preview-link">See Projects →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-contact animate-on-scroll">
+            <div class="container">
+                <div class="contact-cta">
+                    <h2>Ready to work together?</h2>
+                    <p>I'm always open to discussing new opportunities and interesting projects.</p>
+                    <a href="contact.html" class="cta-button">Let's Talk</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 John Doe. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
