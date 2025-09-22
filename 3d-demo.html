@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Maze - John Doe Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 80vh;
+            padding: 2rem;
+        }
+
+        .demo-title {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        #canvas-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 700px;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .game-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            color: white;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .click-to-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            color: white;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 150;
+            pointer-events: none;
+            display: none;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .crosshair::before {
+            width: 20px;
+            height: 2px;
+            top: -1px;
+            left: -10px;
+        }
+
+        .crosshair::after {
+            width: 2px;
+            height: 20px;
+            top: -10px;
+            left: -1px;
+        }
+
+        .pistol-2d {
+            position: absolute;
+            bottom: 0;
+            right: 150px;
+            width: 600px;
+            height: 450px;
+            z-index: 140;
+            pointer-events: none;
+            display: none;
+            transform-origin: center bottom;
+            transition: transform 0.1s ease;
+        }
+
+        .weapon-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .bullet-path {
+            position: absolute;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(to bottom, #ffff00, #ff0000);
+            opacity: 0;
+            z-index: 125;
+            pointer-events: none;
+            transform-origin: top center;
+        }
+
+        @keyframes bulletPath {
+            0% {
+                opacity: 1;
+                height: 0;
+            }
+            50% {
+                opacity: 1;
+                height: 100%;
+            }
+            100% {
+                opacity: 0;
+                height: 100%;
+            }
+        }
+
+        @keyframes recoil {
+            0% { transform: translateX(0) translateY(0) scale(1); }
+            50% { transform: translateX(-15px) translateY(-8px) scale(0.95); }
+            100% { transform: translateX(0) translateY(0) scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        .minimap {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            z-index: 100;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .demo-info {
+            max-width: 800px;
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--card-background);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .instructions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .instruction-group {
+            background: rgba(var(--accent-rgb), 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            #canvas-container {
+                height: 500px;
+            }
+
+            .demo-container {
+                padding: 1rem;
+            }
+
+            .minimap {
+                width: 150px;
+                height: 150px;
+            }
+
+            .game-ui {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>John Doe</h1>
+            </div>
+            <div class="nav-container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="skills.html">Skills</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="3d-demo.html" class="active">3D Demo</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="theme-switcher">
+                    <button id="theme-toggle" class="theme-btn">🎨</button>
+                    <div id="theme-menu" class="theme-menu">
+                        <div class="theme-option" data-theme="dark">Dark</div>
+                        <div class="theme-option" data-theme="blue">Ocean</div>
+                        <div class="theme-option" data-theme="purple">Sunset</div>
+                        <div class="theme-option" data-theme="green">Forest</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="demo-container">
+            <div class="demo-title">
+                <h1>3D Room with 2D Pistol</h1>
+                <p>Walk around and shoot with a 2D pistol overlay</p>
+            </div>
+
+            <div id="canvas-container">
+                <div class="game-ui">
+                    <div>Position: <span id="position">0, 0</span></div>
+                    <div>Shots: <span id="shots">0</span></div>
+                    <div>Hits: <span id="hits">0</span></div>
+                    <div>Accuracy: <span id="accuracy">0%</span></div>
+                </div>
+                <div id="click-to-play" class="click-to-play">
+                    <h3>🎮 Click to Start</h3>
+                    <p>Click anywhere to enable mouse look</p>
+                    <p>Use WASD to move around</p>
+                    <p>Left click to shoot</p>
+                    <p>Press ESC to release mouse</p>
+                </div>
+                <div class="crosshair" id="crosshair"></div>
+                <div class="pistol-2d" id="weapon-display">
+                    <!-- Pistol -->
+                    <img src="pistol.png" alt="Pistol" class="weapon-image" id="pistol-image" style="display: block;" onerror="this.style.display='none'; document.getElementById('pistol-fallback').style.display='block';">
+                    <div id="pistol-fallback" style="display: none; width: 100%; height: 100%; background: linear-gradient(45deg, #333, #666); border-radius: 10px; position: relative;">
+                        <div style="position: absolute; bottom: 20px; right: 50px; width: 200px; height: 80px; background: #222; border-radius: 5px;"></div>
+                        <div style="position: absolute; bottom: 40px; right: 250px; width: 80px; height: 12px; background: #111; border-radius: 0 6px 6px 0;"></div>
+                    </div>
+
+                    <!-- Automatic Rifle -->
+                    <img src="rifle.png" alt="Rifle" class="weapon-image" id="rifle-image" style="display: none;" onerror="this.style.display='none'; document.getElementById('rifle-fallback').style.display='block';">
+                    <div id="rifle-fallback" style="display: none; width: 100%; height: 100%; position: relative;">
+                        <!-- Simple rifle fallback design -->
+                        <div style="position: absolute; bottom: 60px; right: 100px; width: 400px; height: 60px; background: #333; border-radius: 3px;"></div>
+                        <div style="position: absolute; bottom: 80px; right: 500px; width: 120px; height: 20px; background: #222; border-radius: 0 10px 10px 0;"></div>
+                        <div style="position: absolute; bottom: 40px; right: 150px; width: 80px; height: 40px; background: #444; border-radius: 5px;"></div>
+                        <div style="position: absolute; bottom: 20px; right: 80px; color: white; font-family: monospace; font-size: 12px;">Save rifle image as 'rifle.png'</div>
+                    </div>
+                </div>
+                <canvas id="minimap" class="minimap"></canvas>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" id="new-maze">Reset Room</button>
+                <button class="control-btn" id="toggle-minimap">Toggle Minimap</button>
+                <button class="control-btn" id="reset-position">Reset Position</button>
+                <button class="control-btn" id="toggle-fog">Toggle Fog</button>
+                <button class="control-btn" id="fullscreen-btn">Fullscreen</button>
+            </div>
+
+            <div class="demo-info">
+                <h3>3D Room Explorer</h3>
+                <p>Walk around in a simple 3D room with first-person controls and a crosshair!</p>
+
+                <div class="instructions">
+                    <div class="instruction-group">
+                        <h4>🎮 Movement Controls</h4>
+                        <p><strong>W/A/S/D:</strong> Move forward/left/backward/right</p>
+                        <p><strong>Mouse:</strong> Look around (click to enable)</p>
+                        <p><strong>Left Click:</strong> Shoot pistol</p>
+                        <p><strong>ESC:</strong> Release mouse cursor</p>
+                    </div>
+                    <div class="instruction-group">
+                        <h4>🔫 Shooting</h4>
+                        <p><strong>2D Pistol:</strong> CSS-based gun in bottom-right</p>
+                        <p><strong>Muzzle Flash:</strong> Yellow flash when shooting</p>
+                        <p><strong>Recoil:</strong> Gun kicks back when fired</p>
+                        <p><strong>No Target:</strong> Just shoot for fun!</p>
+                    </div>
+                    <div class="instruction-group">
+                        <h4>🎯 Features</h4>
+                        <p><strong>Crosshair:</strong> White crosshair for aiming</p>
+                        <p><strong>Minimap:</strong> Shows position and direction</p>
+                        <p><strong>Collision:</strong> Can't walk through walls</p>
+                        <p><strong>First-Person:</strong> Natural FPS-style controls</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 John Doe. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // 3D Room Game Variables
+        let scene, camera, renderer, raycaster;
+        let roomGroup, enemies = [];
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let wallHeight = 3;
+        let minimapVisible = true;
+        let fogEnabled = true;
+
+        // Shooting variables
+        let shotsFired = 0;
+        let shotsHit = 0;
+
+        // Weapon system
+        let currentWeapon = 'pistol'; // 'pistol' or 'rifle'
+        let isAutoFiring = false;
+        let autoFireInterval = null;
+        let recoilAccumulation = { x: 0, y: 0 };
+        let recoilRecoveryTimer = null;
+
+        // Enemy variables
+        let enemyCount = 5;
+        let enemySpeed = 0.02; // Increased speed for more visible movement
+
+        // Camera controls
+        let yaw = 0; // Horizontal rotation
+        let pitch = 0; // Vertical rotation
+        const maxPitch = Math.PI / 3; // Limit looking up/down
+
+        // Create a simple room with four walls
+        function createRoom() {
+            try {
+                console.log('Creating room...');
+
+                if (roomGroup) {
+                    scene.remove(roomGroup);
+                }
+
+                roomGroup = new THREE.Group();
+
+            // Room dimensions
+            const roomSize = 20;
+            const wallThickness = 1;
+
+            // Create wall texture
+            const wallCanvas = document.createElement('canvas');
+            const wallCtx = wallCanvas.getContext('2d');
+            wallCanvas.width = 256;
+            wallCanvas.height = 256;
+
+            // Create brick pattern
+            wallCtx.fillStyle = '#8B4513';
+            wallCtx.fillRect(0, 0, 256, 256);
+
+            // Draw brick lines
+            wallCtx.strokeStyle = '#654321';
+            wallCtx.lineWidth = 2;
+            for (let i = 0; i < 256; i += 32) {
+                wallCtx.beginPath();
+                wallCtx.moveTo(0, i);
+                wallCtx.lineTo(256, i);
+                wallCtx.stroke();
+
+                // Offset every other row
+                const offset = (Math.floor(i / 32) % 2) * 16;
+                for (let j = offset; j < 256; j += 32) {
+                    wallCtx.beginPath();
+                    wallCtx.moveTo(j, i);
+                    wallCtx.lineTo(j, i + 32);
+                    wallCtx.stroke();
+                }
+            }
+
+            const wallTexture = new THREE.CanvasTexture(wallCanvas);
+            wallTexture.wrapS = THREE.RepeatWrapping;
+            wallTexture.wrapT = THREE.RepeatWrapping;
+
+            const wallMaterial = new THREE.MeshPhongMaterial({
+                map: wallTexture,
+                shininess: 10
+            });
+
+            // Create floor texture
+            const floorCanvas = document.createElement('canvas');
+            const floorCtx = floorCanvas.getContext('2d');
+            floorCanvas.width = 256;
+            floorCanvas.height = 256;
+
+            // Create tile pattern
+            floorCtx.fillStyle = '#2F4F2F';
+            floorCtx.fillRect(0, 0, 256, 256);
+
+            // Draw tile lines
+            floorCtx.strokeStyle = '#1F3F1F';
+            floorCtx.lineWidth = 1;
+            for (let i = 0; i < 256; i += 64) {
+                floorCtx.beginPath();
+                floorCtx.moveTo(0, i);
+                floorCtx.lineTo(256, i);
+                floorCtx.stroke();
+
+                floorCtx.beginPath();
+                floorCtx.moveTo(i, 0);
+                floorCtx.lineTo(i, 256);
+                floorCtx.stroke();
+            }
+
+            const floorTexture = new THREE.CanvasTexture(floorCanvas);
+            floorTexture.wrapS = THREE.RepeatWrapping;
+            floorTexture.wrapT = THREE.RepeatWrapping;
+            floorTexture.repeat.set(10, 10);
+
+            const floorMaterial = new THREE.MeshPhongMaterial({
+                map: floorTexture,
+                shininess: 5
+            });
+
+
+            // Create floor
+            const floorGeometry = new THREE.PlaneGeometry(roomSize, roomSize);
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.set(0, 0, 0);
+            floor.receiveShadow = true;
+            roomGroup.add(floor);
+
+            // Create four walls with proper thickness to prevent see-through
+            // North wall
+            const northWall = new THREE.Mesh(
+                new THREE.BoxGeometry(roomSize + 2, wallHeight, wallThickness * 2),
+                wallMaterial
+            );
+            northWall.position.set(0, wallHeight / 2, -roomSize / 2);
+            northWall.castShadow = true;
+            northWall.receiveShadow = true;
+            roomGroup.add(northWall);
+
+            // South wall
+            const southWall = new THREE.Mesh(
+                new THREE.BoxGeometry(roomSize + 2, wallHeight, wallThickness * 2),
+                wallMaterial
+            );
+            southWall.position.set(0, wallHeight / 2, roomSize / 2);
+            southWall.castShadow = true;
+            southWall.receiveShadow = true;
+            roomGroup.add(southWall);
+
+            // East wall
+            const eastWall = new THREE.Mesh(
+                new THREE.BoxGeometry(wallThickness * 2, wallHeight, roomSize + 2),
+                wallMaterial
+            );
+            eastWall.position.set(roomSize / 2, wallHeight / 2, 0);
+            eastWall.castShadow = true;
+            eastWall.receiveShadow = true;
+            roomGroup.add(eastWall);
+
+            // West wall
+            const westWall = new THREE.Mesh(
+                new THREE.BoxGeometry(wallThickness * 2, wallHeight, roomSize + 2),
+                wallMaterial
+            );
+            westWall.position.set(-roomSize / 2, wallHeight / 2, 0);
+            westWall.castShadow = true;
+            westWall.receiveShadow = true;
+            roomGroup.add(westWall);
+
+            // Create cover material with texture
+            const coverCanvas = document.createElement('canvas');
+            const coverCtx = coverCanvas.getContext('2d');
+            coverCanvas.width = 128;
+            coverCanvas.height = 128;
+
+            // Create metal texture
+            coverCtx.fillStyle = '#696969';
+            coverCtx.fillRect(0, 0, 128, 128);
+
+            // Add metal lines
+            coverCtx.strokeStyle = '#505050';
+            coverCtx.lineWidth = 1;
+            for (let i = 0; i < 128; i += 16) {
+                coverCtx.beginPath();
+                coverCtx.moveTo(0, i);
+                coverCtx.lineTo(128, i);
+                coverCtx.stroke();
+            }
+
+            const coverTexture = new THREE.CanvasTexture(coverCanvas);
+            const coverMaterial = new THREE.MeshPhongMaterial({
+                map: coverTexture,
+                shininess: 20
+            });
+
+            // Cover box 1 - left side
+            const coverBox1 = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 1.5, 2),
+                coverMaterial
+            );
+            coverBox1.position.set(-6, 0.75, -3);
+            coverBox1.castShadow = true;
+            coverBox1.receiveShadow = true;
+            roomGroup.add(coverBox1);
+
+            // Cover box 2 - right side
+            const coverBox2 = new THREE.Mesh(
+                new THREE.BoxGeometry(1.5, 1.2, 1.5),
+                coverMaterial
+            );
+            coverBox2.position.set(5, 0.6, -5);
+            coverBox2.castShadow = true;
+            coverBox2.receiveShadow = true;
+            roomGroup.add(coverBox2);
+
+            // Cover wall - partial wall in middle
+            const coverWall = new THREE.Mesh(
+                new THREE.BoxGeometry(4, 2, 0.5),
+                wallMaterial
+            );
+            coverWall.position.set(3, 1, 2);
+            coverWall.castShadow = true;
+            coverWall.receiveShadow = true;
+            roomGroup.add(coverWall);
+
+            // Cover box 3 - near player spawn
+            const coverBox3 = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 0.8, 3),
+                coverMaterial
+            );
+            coverBox3.position.set(-3, 0.4, 5);
+            coverBox3.castShadow = true;
+            coverBox3.receiveShadow = true;
+            roomGroup.add(coverBox3);
+
+            // Add more walls for complex layout
+            // Additional wall 1 - L-shaped corner
+            const additionalWall1 = new THREE.Mesh(
+                new THREE.BoxGeometry(6, wallHeight, wallThickness),
+                wallMaterial
+            );
+            additionalWall1.position.set(-2, wallHeight / 2, -6);
+            additionalWall1.castShadow = true;
+            additionalWall1.receiveShadow = true;
+            roomGroup.add(additionalWall1);
+
+            // Additional wall 2 - vertical connector
+            const additionalWall2 = new THREE.Mesh(
+                new THREE.BoxGeometry(wallThickness, wallHeight, 4),
+                wallMaterial
+            );
+            additionalWall2.position.set(1, wallHeight / 2, -4);
+            additionalWall2.castShadow = true;
+            additionalWall2.receiveShadow = true;
+            roomGroup.add(additionalWall2);
+
+            // Additional wall 3 - room divider
+            const additionalWall3 = new THREE.Mesh(
+                new THREE.BoxGeometry(8, wallHeight, wallThickness),
+                wallMaterial
+            );
+            additionalWall3.position.set(-4, wallHeight / 2, 3);
+            additionalWall3.castShadow = true;
+            additionalWall3.receiveShadow = true;
+            roomGroup.add(additionalWall3);
+
+            // Additional wall 4 - corner piece
+            const additionalWall4 = new THREE.Mesh(
+                new THREE.BoxGeometry(wallThickness, wallHeight, 5),
+                wallMaterial
+            );
+            additionalWall4.position.set(7, wallHeight / 2, 6);
+            additionalWall4.castShadow = true;
+            additionalWall4.receiveShadow = true;
+            roomGroup.add(additionalWall4);
+
+            // Create multiple enemies (smaller and taller)
+            enemies = [];
+            for (let i = 0; i < enemyCount; i++) {
+                const enemyGeometry = new THREE.PlaneGeometry(0.6, 1.6); // Same height as player
+
+                // Create texture for enemy
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 96;
+                canvas.height = 256;
+
+                // Different colored enemies
+                const colors = ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6'];
+                const color = colors[i % colors.length];
+
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, 96, 256);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Enemy ${i + 1}`, 48, 130);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const enemyMaterial = new THREE.MeshPhongMaterial({
+                    map: texture,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+
+                const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+
+                // Random positions avoiding walls using proper collision detection
+                let posX, posZ, attempts = 0;
+                do {
+                    posX = (Math.random() - 0.5) * 16; // Within room bounds
+                    posZ = (Math.random() - 0.5) * 16;
+                    attempts++;
+                } while (checkCollision({x: posX, z: posZ}) && attempts < 50); // Use collision system
+
+                // Fallback to safe position if can't find spot
+                if (attempts >= 50) {
+                    posX = 0;
+                    posZ = 0;
+                }
+
+                enemy.position.set(posX, 0.8, posZ); // Same height as player camera - half
+                enemy.castShadow = true;
+
+                // Add movement properties
+                enemy.userData = {
+                    direction: Math.random() * Math.PI * 2, // Random initial direction
+                    speed: enemySpeed * (0.8 + Math.random() * 0.7), // Increased speed range
+                    changeDirectionTimer: Math.random() * 200, // Random direction change
+                    originalColor: enemy.material.color.clone(),
+                    alive: true
+                };
+
+                console.log(`Enemy ${i + 1} created at (${posX}, ${posZ}) with speed ${enemy.userData.speed}`);
+
+                enemies.push(enemy);
+                roomGroup.add(enemy);
+            }
+
+
+            scene.add(roomGroup);
+
+            // Reset player position to center
+            camera.position.set(0, 1.6, 0);
+            yaw = 0;
+            pitch = 0;
+
+            console.log('Room created successfully');
+            } catch (error) {
+                console.error('Error creating room:', error);
+            }
+        }
+
+        function checkCollision(newPosition) {
+            const margin = 0.4; // Reduced margin for better gap navigation
+            const roomBounds = 8.8; // Tighter room boundary to prevent phasing
+
+            // Check room boundary collision with proper wall thickness
+            if (Math.abs(newPosition.x) > roomBounds || Math.abs(newPosition.z) > roomBounds) {
+                return true;
+            }
+
+            // Check collision with all interior walls and cover objects
+            const wallCollisions = [
+                // Cover boxes
+                { x: -6, z: -3, width: 2, depth: 2 }, // Cover box 1
+                { x: 5, z: -5, width: 1.5, depth: 1.5 }, // Cover box 2
+                { x: 3, z: 2, width: 4, depth: 0.5 }, // Cover wall
+                { x: -3, z: 5, width: 1, depth: 3 }, // Cover box 3
+
+                // Additional walls
+                { x: -2, z: -6, width: 6, depth: 1 }, // Additional wall 1
+                { x: 1, z: -4, width: 1, depth: 4 }, // Additional wall 2
+                { x: -4, z: 3, width: 8, depth: 1 }, // Additional wall 3
+                { x: 7, z: 6, width: 1, depth: 5 } // Additional wall 4
+            ];
+
+            for (const wall of wallCollisions) {
+                const halfWidth = wall.width / 2 + margin;
+                const halfDepth = wall.depth / 2 + margin;
+
+                if (newPosition.x >= wall.x - halfWidth &&
+                    newPosition.x <= wall.x + halfWidth &&
+                    newPosition.z >= wall.z - halfDepth &&
+                    newPosition.z <= wall.z + halfDepth) {
+                    return true;
+                }
+            }
+
+            // Check collision with living enemies
+            for (const enemy of enemies) {
+                if (enemy.userData.alive) {
+                    const enemyMargin = 0.5;
+                    const distance = Math.sqrt(
+                        Math.pow(newPosition.x - enemy.position.x, 2) +
+                        Math.pow(newPosition.z - enemy.position.z, 2)
+                    );
+                    if (distance < enemyMargin) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function shoot() {
+            shotsFired++;
+            console.log('Shot fired! Total shots:', shotsFired);
+
+            // Get weapon element
+            const weapon = document.getElementById('weapon-display');
+
+            // Apply recoil based on weapon type
+            if (currentWeapon === 'rifle') {
+                // Accumulate recoil for spray pattern
+                recoilAccumulation.x += (Math.random() - 0.5) * 0.8;
+                recoilAccumulation.y += Math.random() * 0.6;
+
+                // Limit maximum recoil
+                recoilAccumulation.x = Math.max(-5, Math.min(5, recoilAccumulation.x));
+                recoilAccumulation.y = Math.max(0, Math.min(8, recoilAccumulation.y));
+
+                // Apply recoil to camera
+                pitch += recoilAccumulation.y * 0.005;
+                yaw += recoilAccumulation.x * 0.003;
+
+                // Clamp pitch
+                pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+
+                // Start recoil recovery
+                if (recoilRecoveryTimer) clearTimeout(recoilRecoveryTimer);
+                recoilRecoveryTimer = setTimeout(() => {
+                    const recoveryInterval = setInterval(() => {
+                        recoilAccumulation.x *= 0.9;
+                        recoilAccumulation.y *= 0.9;
+
+                        if (Math.abs(recoilAccumulation.x) < 0.1 && Math.abs(recoilAccumulation.y) < 0.1) {
+                            recoilAccumulation = { x: 0, y: 0 };
+                            clearInterval(recoveryInterval);
+                        }
+                    }, 50);
+                }, 200);
+            }
+
+            // Check for hit using raycaster against all living enemies
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const livingEnemies = enemies.filter(enemy => enemy.userData.alive);
+            const intersects = raycaster.intersectObjects(livingEnemies, false);
+
+            let isHit = false;
+            if (intersects.length > 0) {
+                const hitEnemy = intersects[0].object;
+                shotsHit++;
+                isHit = true;
+                console.log('Enemy hit! Total hits:', shotsHit);
+
+                // Mark enemy as dead and start fall animation
+                hitEnemy.userData.alive = false;
+                hitEnemy.material.color.setRGB(0.3, 0.3, 0.3); // Grey out dead enemy
+                hitEnemy.material.opacity = 0.7;
+
+                // Fall over animation
+                const fallDuration = 800;
+                const startRotation = hitEnemy.rotation.x;
+                const startTime = Date.now();
+
+                const animateFall = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / fallDuration, 1);
+
+                    // Ease out animation
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                    hitEnemy.rotation.x = startRotation + (Math.PI / 2) * easeOut;
+                    hitEnemy.position.y = 0.8 * (1 - easeOut * 0.9); // Fall down
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateFall);
+                    } else {
+                        // Remove from scene after fall
+                        setTimeout(() => {
+                            roomGroup.remove(hitEnemy);
+                            const index = enemies.indexOf(hitEnemy);
+                            if (index > -1) enemies.splice(index, 1);
+                        }, 2000);
+                    }
+                };
+                animateFall();
+            }
+
+            // Create bullet path visualization
+            createBulletPath(isHit);
+
+            // Trigger weapon recoil animation
+            const recoilDuration = currentWeapon === 'rifle' ? '0.1s' : '0.2s';
+            weapon.style.animation = `recoil ${recoilDuration} ease-out`;
+
+            // Reset animations after they complete
+            setTimeout(() => {
+                weapon.style.animation = '';
+            }, currentWeapon === 'rifle' ? 100 : 200);
+        }
+
+        function createBulletPath(isHit) {
+            // Create bullet path line element
+            const path = document.createElement('div');
+            path.className = 'bullet-path';
+
+            const container = document.getElementById('canvas-container');
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate path from crosshair center (reverted to original)
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+
+            // Position the path line at crosshair center
+            path.style.left = (centerX - 1) + 'px'; // Center the 2px wide line
+            path.style.top = centerY + 'px';
+
+            // Calculate path length based on hit or screen bounds
+            let pathLength;
+            if (isHit) {
+                // Calculate distance to target on screen (approximate)
+                pathLength = containerRect.height * 0.3; // Target is roughly 30% up from center
+            } else {
+                // Full screen distance
+                pathLength = containerRect.height * 0.8;
+            }
+
+            // Set the path direction and length (reverted to simple straight line)
+            path.style.height = pathLength + 'px';
+            path.style.transform = 'rotate(-15deg)'; // Simple upward angle
+
+            // Add path to container
+            container.appendChild(path);
+
+            // Start animation
+            path.style.animation = 'bulletPath 0.3s ease-out forwards';
+
+            // Remove path after animation
+            setTimeout(() => {
+                if (path.parentNode) {
+                    path.parentNode.removeChild(path);
+                }
+            }, 300);
+        }
+
+
+        function updateMinimap() {
+            const canvas = document.getElementById('minimap');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 200;
+            canvas.height = 200;
+
+            if (!minimapVisible) {
+                ctx.clearRect(0, 0, 200, 200);
+                return;
+            }
+
+            const roomSize = 20;
+            const scale = 200 / roomSize;
+            const centerOffset = 100; // Center the room in the minimap
+
+            // Clear canvas
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 200, 200);
+
+            // Draw room floor
+            ctx.fillStyle = '#2F4F2F';
+            ctx.fillRect(
+                centerOffset - (roomSize / 2) * scale,
+                centerOffset - (roomSize / 2) * scale,
+                roomSize * scale,
+                roomSize * scale
+            );
+
+            // Draw walls
+            ctx.fillStyle = '#8B4513';
+            const wallThickness = 3;
+
+            // North wall
+            ctx.fillRect(centerOffset - (roomSize / 2) * scale, centerOffset - (roomSize / 2) * scale, roomSize * scale, wallThickness);
+            // South wall
+            ctx.fillRect(centerOffset - (roomSize / 2) * scale, centerOffset + (roomSize / 2) * scale - wallThickness, roomSize * scale, wallThickness);
+            // West wall
+            ctx.fillRect(centerOffset - (roomSize / 2) * scale, centerOffset - (roomSize / 2) * scale, wallThickness, roomSize * scale);
+            // East wall
+            ctx.fillRect(centerOffset + (roomSize / 2) * scale - wallThickness, centerOffset - (roomSize / 2) * scale, wallThickness, roomSize * scale);
+
+            // Draw enemies on minimap
+            enemies.forEach(enemy => {
+                if (enemy.userData.alive) {
+                    ctx.fillStyle = '#FF0000';
+                    ctx.beginPath();
+                    ctx.arc(
+                        centerOffset + enemy.position.x * scale,
+                        centerOffset + enemy.position.z * scale,
+                        3,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fill();
+                }
+            });
+
+            // Draw player
+            ctx.fillStyle = '#0080FF';
+            ctx.beginPath();
+            ctx.arc(
+                centerOffset + camera.position.x * scale,
+                centerOffset + camera.position.z * scale,
+                4,
+                0,
+                2 * Math.PI
+            );
+            ctx.fill();
+
+            // Draw player direction indicator
+            ctx.strokeStyle = '#0080FF';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(
+                centerOffset + camera.position.x * scale,
+                centerOffset + camera.position.z * scale
+            );
+            ctx.lineTo(
+                centerOffset + camera.position.x * scale - Math.sin(yaw) * 12,
+                centerOffset + camera.position.z * scale - Math.cos(yaw) * 12
+            );
+            ctx.stroke();
+        }
+
+        function updateUI() {
+            const posX = Math.floor(camera.position.x);
+            const posZ = Math.floor(camera.position.z);
+            document.getElementById('position').textContent = `${posX}, ${posZ}`;
+
+            // Update shooting stats
+            document.getElementById('shots').textContent = shotsFired;
+            document.getElementById('hits').textContent = shotsHit;
+            const accuracy = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function init() {
+            try {
+                // Create scene
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87CEEB);
+
+                // Add fog
+                scene.fog = new THREE.Fog(0x87CEEB, 1, 50);
+
+                // Create camera
+                const container = document.getElementById('canvas-container');
+                camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 100);
+                camera.position.set(0, 1.6, 0);
+
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                container.appendChild(renderer.domElement);
+
+                // Create raycaster for hit detection
+                raycaster = new THREE.Raycaster();
+
+
+                // Add dramatic lighting
+                const ambientLight = new THREE.AmbientLight(0x202040, 0.3); // Darker, bluer ambient
+                scene.add(ambientLight);
+
+                // Main directional light (sun)
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                directionalLight.position.set(15, 25, 10);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 4096;
+                directionalLight.shadow.mapSize.height = 4096;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 60;
+                directionalLight.shadow.camera.left = -30;
+                directionalLight.shadow.camera.right = 30;
+                directionalLight.shadow.camera.top = 30;
+                directionalLight.shadow.camera.bottom = -30;
+                directionalLight.shadow.bias = -0.0001;
+                scene.add(directionalLight);
+
+                // Add dramatic rim lighting
+                const rimLight1 = new THREE.DirectionalLight(0xff6600, 0.6); // Orange rim
+                rimLight1.position.set(-20, 10, -15);
+                scene.add(rimLight1);
+
+                const rimLight2 = new THREE.DirectionalLight(0x0066ff, 0.4); // Blue rim
+                rimLight2.position.set(20, 8, 15);
+                scene.add(rimLight2);
+
+                // Add point lights for dramatic effect
+                const pointLight1 = new THREE.PointLight(0xffaa00, 1.0, 20);
+                pointLight1.position.set(-8, 4, -8);
+                pointLight1.castShadow = true;
+                scene.add(pointLight1);
+
+                const pointLight2 = new THREE.PointLight(0x00aaff, 0.8, 15);
+                pointLight2.position.set(8, 3, 8);
+                pointLight2.castShadow = true;
+                scene.add(pointLight2);
+
+                // Generate initial room
+                createRoom();
+
+                // Setup controls
+                setupControls();
+                setupEventListeners();
+
+                // Handle window resize
+                function onWindowResize() {
+                    const container = document.getElementById('canvas-container');
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+                window.addEventListener('resize', onWindowResize);
+
+                // Start the animation loop
+                animate();
+
+                console.log('3D scene initialized successfully');
+            } catch (error) {
+                console.error('Error initializing 3D scene:', error);
+            }
+        }
+
+        function setupControls() {
+            document.getElementById('new-maze').addEventListener('click', createRoom);
+
+            document.getElementById('toggle-minimap').addEventListener('click', () => {
+                minimapVisible = !minimapVisible;
+                document.getElementById('toggle-minimap').textContent =
+                    minimapVisible ? 'Hide Minimap' : 'Show Minimap';
+            });
+
+            document.getElementById('reset-position').addEventListener('click', () => {
+                camera.position.set(0, 1.6, 0);
+                yaw = 0;
+                pitch = 0;
+                camera.rotation.set(0, 0, 0);
+            });
+
+            document.getElementById('toggle-fog').addEventListener('click', () => {
+                fogEnabled = !fogEnabled;
+                scene.fog = fogEnabled ? new THREE.Fog(0x87CEEB, 1, 50) : null;
+                document.getElementById('toggle-fog').textContent =
+                    fogEnabled ? 'Disable Fog' : 'Enable Fog';
+            });
+
+            document.getElementById('fullscreen-btn').addEventListener('click', () => {
+                const container = document.getElementById('canvas-container');
+                if (!document.fullscreenElement) {
+                    container.requestFullscreen().then(() => {
+                        document.getElementById('fullscreen-btn').textContent = 'Exit Fullscreen';
+                        // Resize renderer to fullscreen
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                    });
+                } else {
+                    document.exitFullscreen().then(() => {
+                        document.getElementById('fullscreen-btn').textContent = 'Fullscreen';
+                        // Resize back to container
+                        const container = document.getElementById('canvas-container');
+                        camera.aspect = container.clientWidth / container.clientHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(container.clientWidth, container.clientHeight);
+                    });
+                }
+            });
+        }
+
+
+        function switchWeapon(weaponType) {
+            currentWeapon = weaponType;
+
+            // Hide all weapons
+            document.getElementById('pistol-image').style.display = 'none';
+            document.getElementById('pistol-fallback').style.display = 'none';
+            document.getElementById('rifle-image').style.display = 'none';
+            document.getElementById('rifle-fallback').style.display = 'none';
+
+            // Show selected weapon
+            if (weaponType === 'pistol') {
+                const pistolImg = document.getElementById('pistol-image');
+                if (pistolImg.complete && pistolImg.naturalWidth > 0) {
+                    pistolImg.style.display = 'block';
+                } else {
+                    document.getElementById('pistol-fallback').style.display = 'block';
+                }
+            } else if (weaponType === 'rifle') {
+                const rifleImg = document.getElementById('rifle-image');
+                if (rifleImg.complete && rifleImg.naturalWidth > 0) {
+                    rifleImg.style.display = 'block';
+                } else {
+                    document.getElementById('rifle-fallback').style.display = 'block';
+                }
+            }
+
+            // Stop any auto-firing when switching weapons
+            isAutoFiring = false;
+            if (autoFireInterval) {
+                clearInterval(autoFireInterval);
+                autoFireInterval = null;
+            }
+
+            console.log('Switched to:', weaponType);
+        }
+
+        function setupEventListeners() {
+            // Mouse controls with pointer lock for better FPS experience
+            let isPointerLocked = false;
+
+            // Click handler for starting game and shooting
+            renderer.domElement.addEventListener('click', (event) => {
+                if (!document.pointerLockElement) {
+                    // Request pointer lock and auto-fullscreen
+                    console.log('Requesting pointer lock...');
+                    renderer.domElement.requestPointerLock();
+
+                    // Auto-enter fullscreen when game begins
+                    const container = document.getElementById('canvas-container');
+                    if (!document.fullscreenElement) {
+                        container.requestFullscreen().then(() => {
+                            document.getElementById('fullscreen-btn').textContent = 'Exit Fullscreen';
+                            // Resize renderer to fullscreen
+                            camera.aspect = window.innerWidth / window.innerHeight;
+                            camera.updateProjectionMatrix();
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                        }).catch(err => {
+                            console.log('Fullscreen failed:', err);
+                        });
+                    }
+                } else if (document.pointerLockElement === renderer.domElement) {
+                    // Already in pointer lock - shoot (only for pistol or single shots)
+                    if (currentWeapon === 'pistol') {
+                        shoot();
+                    }
+                }
+            });
+
+            // Mouse down for shooting (both weapons)
+            renderer.domElement.addEventListener('mousedown', (event) => {
+                if (document.pointerLockElement === renderer.domElement && event.button === 0) {
+                    // First shot for any weapon
+                    if (currentWeapon === 'rifle') {
+                        shoot(); // Initial rifle shot
+
+                        // Start auto-fire for rifle
+                        if (!isAutoFiring) {
+                            isAutoFiring = true;
+                            autoFireInterval = setInterval(() => {
+                                if (isAutoFiring) {
+                                    shoot();
+                                }
+                            }, 250); // 4 rounds per second (1000ms / 4 = 250ms)
+                        }
+                    }
+                    // Pistol shooting is handled by click event
+                }
+            });
+
+            // Mouse up to stop auto-fire
+            renderer.domElement.addEventListener('mouseup', (event) => {
+                if (event.button === 0) {
+                    isAutoFiring = false;
+                    if (autoFireInterval) {
+                        clearInterval(autoFireInterval);
+                        autoFireInterval = null;
+                    }
+                }
+            });
+
+            // Handle pointer lock changes
+            document.addEventListener('pointerlockchange', () => {
+                isPointerLocked = document.pointerLockElement === renderer.domElement;
+                console.log('Pointer lock changed:', isPointerLocked, document.pointerLockElement);
+
+                // Show/hide click to play overlay, crosshair, and weapon
+                const overlay = document.getElementById('click-to-play');
+                const crosshair = document.getElementById('crosshair');
+                const weapon = document.getElementById('weapon-display');
+                if (isPointerLocked) {
+                    console.log('Entering game mode');
+                    overlay.style.display = 'none';
+                    crosshair.style.display = 'block';
+                    weapon.style.display = 'block';
+                    // Initialize with pistol
+                    switchWeapon('pistol');
+                } else {
+                    console.log('Exiting game mode');
+                    overlay.style.display = 'block';
+                    crosshair.style.display = 'none';
+                    weapon.style.display = 'none';
+                    // Stop auto-firing when losing focus
+                    isAutoFiring = false;
+                    if (autoFireInterval) {
+                        clearInterval(autoFireInterval);
+                        autoFireInterval = null;
+                    }
+                }
+            });
+
+            // Mouse movement for looking around
+            document.addEventListener('mousemove', (event) => {
+                if (!isPointerLocked) return;
+
+                const sensitivity = 0.002;
+                yaw -= event.movementX * sensitivity;
+                pitch -= event.movementY * sensitivity; // Natural up/down
+
+                // Clamp vertical rotation to prevent flipping
+                pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+
+                // Apply rotations to camera
+                camera.rotation.order = 'YXZ';
+                camera.rotation.y = yaw;
+                camera.rotation.x = pitch;
+            });
+
+            // Keyboard controls
+            document.addEventListener('keydown', (event) => {
+                switch (event.code) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        moveForward = true;
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        moveBackward = true;
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        moveLeft = true;
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        moveRight = true;
+                        break;
+                    case 'Escape':
+                        document.exitPointerLock();
+                        break;
+                    case 'Digit1':
+                        switchWeapon('rifle');
+                        break;
+                    case 'Digit2':
+                        switchWeapon('pistol');
+                        break;
+                }
+            });
+
+            document.addEventListener('keyup', (event) => {
+                switch (event.code) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        moveForward = false;
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        moveBackward = false;
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        moveLeft = false;
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        moveRight = false;
+                        break;
+                }
+            });
+        }
+
+        let frameCount = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Debug: Log first few frames
+            frameCount++;
+            if (frameCount <= 3) {
+                console.log(`Animation frame ${frameCount}`);
+            }
+
+            // Movement speed
+            const moveSpeed = 0.04;
+
+            // Calculate movement based on current yaw (horizontal rotation only)
+            if (moveForward || moveBackward || moveLeft || moveRight) {
+                const movement = new THREE.Vector3(0, 0, 0);
+
+                // Calculate forward/backward movement
+                if (moveForward) {
+                    movement.x -= Math.sin(yaw) * moveSpeed;
+                    movement.z -= Math.cos(yaw) * moveSpeed;
+                }
+                if (moveBackward) {
+                    movement.x += Math.sin(yaw) * moveSpeed;
+                    movement.z += Math.cos(yaw) * moveSpeed;
+                }
+
+                // Calculate left/right movement (strafe)
+                if (moveLeft) {
+                    movement.x -= Math.cos(yaw) * moveSpeed;
+                    movement.z += Math.sin(yaw) * moveSpeed;
+                }
+                if (moveRight) {
+                    movement.x += Math.cos(yaw) * moveSpeed;
+                    movement.z -= Math.sin(yaw) * moveSpeed;
+                }
+
+                // Apply movement with collision detection
+                const newPosition = camera.position.clone();
+                newPosition.add(movement);
+
+                // Check collision separately for X and Z movement for wall sliding
+                const testPositionX = camera.position.clone();
+                testPositionX.x = newPosition.x;
+
+                const testPositionZ = camera.position.clone();
+                testPositionZ.z = newPosition.z;
+
+                if (!checkCollision(testPositionX)) {
+                    camera.position.x = newPosition.x;
+                }
+
+                if (!checkCollision(testPositionZ)) {
+                    camera.position.z = newPosition.z;
+                }
+            }
+
+            // Make all living enemies face the player and move
+            enemies.forEach((enemy, index) => {
+                if (enemy.userData.alive) {
+                    // Always face the player
+                    enemy.lookAt(camera.position);
+
+                    // Simple AI movement
+                    enemy.userData.changeDirectionTimer--;
+                    if (enemy.userData.changeDirectionTimer <= 0) {
+                        enemy.userData.direction = Math.random() * Math.PI * 2;
+                        enemy.userData.changeDirectionTimer = 100 + Math.random() * 200;
+                        if (frameCount % 300 === 0) { // Debug every 5 seconds
+                            console.log(`Enemy ${index + 1} changing direction to ${enemy.userData.direction}`);
+                        }
+                    }
+
+                    // Move enemy
+                    const moveX = Math.sin(enemy.userData.direction) * enemy.userData.speed;
+                    const moveZ = Math.cos(enemy.userData.direction) * enemy.userData.speed;
+
+                    const newPos = enemy.position.clone();
+                    newPos.x += moveX;
+                    newPos.z += moveZ;
+
+                    // Check collision for enemy movement
+                    if (!checkCollision(newPos)) {
+                        enemy.position.x = newPos.x;
+                        enemy.position.z = newPos.z;
+                    } else {
+                        // Bounce off walls and obstacles
+                        enemy.userData.direction += Math.PI + (Math.random() - 0.5) * 0.5;
+                        enemy.userData.changeDirectionTimer = 50; // Change direction soon
+                        if (frameCount % 300 === 0) { // Debug collision bounces
+                            console.log(`Enemy ${index + 1} bounced off obstacle`);
+                        }
+                    }
+                }
+            });
+
+            // Update UI and minimap
+            updateUI();
+            updateMinimap();
+
+            // Render scene
+            renderer.render(scene, camera);
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            init();
+        });
+    </script>
+</body>
+</html>
