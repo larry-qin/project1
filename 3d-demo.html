@@ -538,7 +538,9 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
     <script src="script.js"></script>
+    <script src="multiplayer-client.js"></script>
     <script>
         // 3D Room Game Variables
         let scene, camera, renderer, raycaster;
@@ -562,6 +564,11 @@
         // Enemy variables
         let enemyCount = 5;
         let enemySpeed = 0.02; // Increased speed for more visible movement
+
+        // Multiplayer variables
+        let networkPlayers = new Map(); // Store network player meshes
+        let isMultiplayer = false;
+        let playerName = null;
 
         // Camera controls
         let yaw = 0; // Horizontal rotation
@@ -946,6 +953,15 @@
         function shoot() {
             shotsFired++;
             console.log('Shot fired! Total shots:', shotsFired);
+
+            // Send multiplayer shoot event
+            if (isMultiplayer && multiplayerClient.isMultiplayerActive()) {
+                multiplayerClient.sendShootEvent(
+                    camera.position,
+                    { yaw: yaw, pitch: pitch },
+                    currentWeapon
+                );
+            }
 
             // Get weapon element
             const weapon = document.getElementById('weapon-display');
@@ -1646,6 +1662,15 @@
                 }
             });
 
+            // Send multiplayer updates
+            if (isMultiplayer && multiplayerClient.isMultiplayerActive()) {
+                multiplayerClient.sendPlayerUpdate(
+                    camera.position,
+                    { yaw: yaw, pitch: pitch },
+                    currentWeapon
+                );
+            }
+
             // Update UI and minimap
             updateUI();
             updateMinimap();
@@ -1654,9 +1679,78 @@
             renderer.render(scene, camera);
         }
 
+        // Network player callback functions
+        window.onNetworkPlayerJoined = function(player) {
+            console.log(`Creating visual for network player: ${player.name}`);
+
+            // Create player mesh using enemy pattern
+            const playerGeometry = new THREE.PlaneGeometry(0.6, 1.6);
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 96;
+            canvas.height = 256;
+
+            ctx.fillStyle = '#00AAFF'; // Blue color for network players
+            ctx.fillRect(0, 0, 96, 256);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(player.name, 48, 130);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const playerMaterial = new THREE.MeshPhongMaterial({
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            const playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
+            playerMesh.position.set(player.position.x, player.position.y, player.position.z);
+            playerMesh.castShadow = true;
+
+            player.mesh = playerMesh;
+            networkPlayers.set(player.id, player);
+            roomGroup.add(playerMesh);
+        };
+
+        window.onNetworkPlayerUpdate = function(player) {
+            if (player.mesh) {
+                player.mesh.position.set(player.position.x, player.position.y, player.position.z);
+                player.mesh.lookAt(camera.position); // Always face camera like enemies
+            }
+        };
+
+        window.onNetworkPlayerShoot = function(player, origin, direction, weapon) {
+            console.log(`Network player ${player.name} shot with ${weapon}`);
+            // Reuse existing muzzle flash effect
+            createBulletPath(false); // Show bullet path without hit
+        };
+
+        window.onNetworkPlayerLeft = function(player) {
+            console.log(`Network player ${player.name} left`);
+            if (player.mesh) {
+                roomGroup.remove(player.mesh);
+            }
+            networkPlayers.delete(player.id);
+        };
+
         // Initialize when page loads
         window.addEventListener('load', () => {
             init();
+
+            // Check for multiplayer parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            const playerNameParam = urlParams.get('name');
+
+            if (roomId && playerNameParam) {
+                isMultiplayer = true;
+                playerName = playerNameParam;
+                multiplayerClient.connect();
+                multiplayerClient.joinRoom(roomId, playerName);
+                console.log(`Joining multiplayer room: ${roomId} as ${playerName}`);
+            }
         });
     </script>
 </body>

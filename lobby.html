@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D FPS Multiplayer Lobby</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .lobby-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 2rem;
+        }
+
+        .lobby-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .lobby-title {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .lobby-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--secondary-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .lobby-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .lobby-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .lobby-btn-primary {
+            background: linear-gradient(145deg, var(--accent-color), rgba(100, 255, 218, 0.8));
+            color: white;
+        }
+
+        .lobby-btn-primary:hover {
+            background: linear-gradient(145deg, rgba(100, 255, 218, 0.9), var(--accent-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+        }
+
+        .lobby-btn-secondary {
+            background: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .lobby-btn-secondary:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-connecting {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status-connected {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .status-error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .room-info {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .lobby-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .lobby-buttons {
+                flex-direction: column;
+            }
+
+            .lobby-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>John Doe</h1>
+            </div>
+            <div class="nav-container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="skills.html">Skills</a></li>
+                    <li><a href="projects.html">Projects</a></li>
+                    <li><a href="3d-demo.html">3D Demo</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="theme-switcher">
+                    <button id="theme-toggle" class="theme-btn">🎨</button>
+                    <div id="theme-menu" class="theme-menu">
+                        <div class="theme-option" data-theme="dark">Dark</div>
+                        <div class="theme-option" data-theme="blue">Ocean</div>
+                        <div class="theme-option" data-theme="purple">Sunset</div>
+                        <div class="theme-option" data-theme="green">Forest</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="lobby-container">
+            <div class="lobby-card">
+                <h1 class="lobby-title">🎮 Multiplayer Lobby</h1>
+                <p class="lobby-subtitle">Join or create a room to play with friends!</p>
+
+                <form id="lobby-form">
+                    <div class="form-group">
+                        <label for="player-name" class="form-label">Player Name</label>
+                        <input type="text" id="player-name" class="form-input" placeholder="Enter your name" required maxlength="20">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="room-id" class="form-label">Room Code</label>
+                        <input type="text" id="room-id" class="form-input" placeholder="Enter room code or leave empty to create" maxlength="10">
+                    </div>
+
+                    <div class="lobby-buttons">
+                        <button type="submit" class="lobby-btn lobby-btn-primary" id="join-btn">
+                            Join/Create Room
+                        </button>
+                        <button type="button" class="lobby-btn lobby-btn-secondary" id="single-player-btn">
+                            Single Player
+                        </button>
+                    </div>
+                </form>
+
+                <div id="connection-status" class="connection-status"></div>
+
+                <div class="room-info">
+                    <p><strong>How to play:</strong></p>
+                    <ul style="text-align: left; margin-top: 0.5rem;">
+                        <li>Enter your name and optionally a room code</li>
+                        <li>Share the room code with friends to play together</li>
+                        <li>Up to 8 players can join the same room</li>
+                        <li>Use WASD to move, mouse to look, click to shoot</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 John Doe. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const form = document.getElementById('lobby-form');
+        const playerNameInput = document.getElementById('player-name');
+        const roomIdInput = document.getElementById('room-id');
+        const joinBtn = document.getElementById('join-btn');
+        const singlePlayerBtn = document.getElementById('single-player-btn');
+        const statusDiv = document.getElementById('connection-status');
+
+        // Generate random room ID if empty
+        function generateRoomId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `connection-status status-${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        // Hide status message
+        function hideStatus() {
+            statusDiv.style.display = 'none';
+        }
+
+        // Test connection to server
+        function testConnection() {
+            showStatus('Connecting to server...', 'connecting');
+
+            const socket = io(window.location.origin);
+
+            socket.on('connect', () => {
+                showStatus('Connected to server!', 'connected');
+                socket.disconnect();
+            });
+
+            socket.on('connect_error', () => {
+                showStatus('Server not available. Try single player mode.', 'error');
+            });
+
+            setTimeout(() => {
+                if (socket.connected) {
+                    socket.disconnect();
+                }
+            }, 3000);
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const playerName = playerNameInput.value.trim();
+            const roomId = roomIdInput.value.trim() || generateRoomId();
+
+            if (!playerName) {
+                showStatus('Please enter your name', 'error');
+                return;
+            }
+
+            // Redirect to game with multiplayer parameters
+            const gameUrl = `3d-demo.html?room=${encodeURIComponent(roomId)}&name=${encodeURIComponent(playerName)}`;
+            window.location.href = gameUrl;
+        });
+
+        // Handle single player button
+        singlePlayerBtn.addEventListener('click', () => {
+            window.location.href = '3d-demo.html';
+        });
+
+        // Test connection on page load
+        window.addEventListener('load', () => {
+            testConnection();
+        });
+    </script>
+</body>
+</html>
