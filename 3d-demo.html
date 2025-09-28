@@ -159,6 +159,147 @@
             z-index: 100;
         }
 
+        .help-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .help-modal {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            color: white;
+            font-family: monospace;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(100, 255, 218, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-10px);
+            animation: floatIn 0.4s ease-out forwards;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-10px) scale(1);
+            }
+        }
+
+        .help-modal:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6),
+                        0 0 0 1px rgba(100, 255, 218, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .help-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 1rem;
+        }
+
+        .help-header h2 {
+            color: var(--accent-color);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .help-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .help-section {
+            background: rgba(var(--accent-rgb), 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+        }
+
+        .help-section h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .help-controls {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-controls li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .key-combo {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent-color);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .help-footer {
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .close-btn {
+            background: linear-gradient(145deg, var(--accent-color), rgba(100, 255, 218, 0.8));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .close-btn:hover {
+            background: linear-gradient(145deg, rgba(100, 255, 218, 0.9), var(--accent-color));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .close-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 10px rgba(100, 255, 218, 0.3);
+        }
+
         .controls {
             margin-top: 2rem;
             display: flex;
@@ -278,6 +419,56 @@
                     <p>Left click to shoot</p>
                     <p>Press ESC to release mouse</p>
                 </div>
+                <div id="help-overlay" class="help-overlay" style="display: none;">
+                    <div class="help-modal">
+                        <div class="help-header">
+                            <h2>🎮 Game Controls & Help</h2>
+                            <p>Master these controls to navigate and dominate the 3D room!</p>
+                        </div>
+                        <div class="help-content">
+                            <div class="help-section">
+                                <h3>🚶 Movement Controls</h3>
+                                <ul class="help-controls">
+                                    <li><span class="key-combo">W</span> Move Forward</li>
+                                    <li><span class="key-combo">S</span> Move Backward</li>
+                                    <li><span class="key-combo">A</span> Strafe Left</li>
+                                    <li><span class="key-combo">D</span> Strafe Right</li>
+                                    <li><span class="key-combo">Mouse</span> Look Around</li>
+                                </ul>
+                            </div>
+                            <div class="help-section">
+                                <h3>🔫 Combat Controls</h3>
+                                <ul class="help-controls">
+                                    <li><span class="key-combo">Click</span> Start Game / Shoot</li>
+                                    <li><span class="key-combo">1</span> Switch to Rifle</li>
+                                    <li><span class="key-combo">2</span> Switch to Pistol</li>
+                                    <li><span class="key-combo">Hold</span> Auto-fire (Rifle)</li>
+                                </ul>
+                            </div>
+                            <div class="help-section">
+                                <h3>🎛️ Game Controls</h3>
+                                <ul class="help-controls">
+                                    <li><span class="key-combo">ESC</span> Release Mouse Lock</li>
+                                    <li><span class="key-combo">H</span> Toggle Help Menu</li>
+                                    <li><span class="key-combo">F11</span> Toggle Fullscreen</li>
+                                </ul>
+                            </div>
+                            <div class="help-section">
+                                <h3>🎯 Game Features</h3>
+                                <ul class="help-controls">
+                                    <li><span class="key-combo">📍</span> Minimap shows position</li>
+                                    <li><span class="key-combo">🎯</span> Crosshair for aiming</li>
+                                    <li><span class="key-combo">💥</span> Muzzle flash effects</li>
+                                    <li><span class="key-combo">👾</span> Moving enemy targets</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-footer">
+                            <button class="close-btn" onclick="hideHelp()">Got it! Let's Play</button>
+                            <p>Press <strong>ESC</strong> or click outside to close this help menu</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="crosshair" id="crosshair"></div>
                 <div class="pistol-2d" id="weapon-display">
                     <!-- Pistol -->
@@ -306,6 +497,7 @@
                 <button class="control-btn" id="reset-position">Reset Position</button>
                 <button class="control-btn" id="toggle-fog">Toggle Fog</button>
                 <button class="control-btn" id="fullscreen-btn">Fullscreen</button>
+                <button class="control-btn" id="help-btn">? Help</button>
             </div>
 
             <div class="demo-info">
@@ -1123,8 +1315,33 @@
                     });
                 }
             });
+
+            document.getElementById('help-btn').addEventListener('click', showHelp);
+
+            // Add click-outside-to-close for help overlay
+            document.getElementById('help-overlay').addEventListener('click', (e) => {
+                if (e.target.id === 'help-overlay') {
+                    hideHelp();
+                }
+            });
         }
 
+        function showHelp() {
+            document.getElementById('help-overlay').style.display = 'flex';
+        }
+
+        function hideHelp() {
+            document.getElementById('help-overlay').style.display = 'none';
+        }
+
+        function toggleHelp() {
+            const helpOverlay = document.getElementById('help-overlay');
+            if (helpOverlay.style.display === 'flex') {
+                hideHelp();
+            } else {
+                showHelp();
+            }
+        }
 
         function switchWeapon(weaponType) {
             currentWeapon = weaponType;
@@ -1293,7 +1510,14 @@
                         moveRight = true;
                         break;
                     case 'Escape':
-                        document.exitPointerLock();
+                        if (document.getElementById('help-overlay').style.display === 'flex') {
+                            hideHelp();
+                        } else {
+                            document.exitPointerLock();
+                        }
+                        break;
+                    case 'KeyH':
+                        toggleHelp();
                         break;
                     case 'Digit1':
                         switchWeapon('rifle');

@@ -1,0 +1,64 @@
+version: "1.0.0"
+generatedBy: "edp-6-mcp"
+timestamp: "2025-09-28T12:00:00Z"
+originalIntent: "Create a help box that the user can activate on this website to learn controls."
+scope:
+  allowedPaths:
+    - "3d-demo.html"
+  forbiddenPaths:
+    - "index.html"
+    - "about.html"
+    - "skills.html"
+    - "projects.html"
+    - "contact.html"
+    - "styles.css"
+    - "script.js"
+  newFiles: []
+apiContracts:
+  - name: "showHelp"
+    type: "function"
+    params: []
+    returns: "void"
+    required: true
+  - name: "hideHelp"
+    type: "function"
+    params: []
+    returns: "void"
+    required: true
+  - name: "toggleHelp"
+    type: "function"
+    params: []
+    returns: "void"
+    required: true
+acceptanceCriteria:
+  - id: "AC-001"
+    description: "User can activate help overlay"
+    given: "User is on 3D demo page"
+    when: "User clicks help button or presses H key"
+    then: "Help overlay appears with controls explanation"
+  - id: "AC-002"
+    description: "User can dismiss help overlay"
+    given: "Help overlay is visible"
+    when: "User clicks close button, presses ESC, or clicks outside"
+    then: "Help overlay disappears and game is accessible"
+  - id: "AC-003"
+    description: "Help content explains all controls"
+    given: "Help overlay is visible"
+    when: "User reads help content"
+    then: "All movement, combat, and game controls are documented"
+  - id: "AC-004"
+    description: "Help integrates with existing design"
+    given: "Help overlay is displayed"
+    when: "User views the interface"
+    then: "Help follows existing visual patterns and theme support"
+nonGoals:
+  - "Interactive tutorials or guided walkthroughs"
+  - "Help for other pages besides 3D demo"
+  - "Advanced onboarding flows"
+  - "Progressive disclosure help systems"
+  - "Context-sensitive tooltips"
+complexityBudget:
+  maxNewFunctions: 3
+  maxNewFiles: 0
+  maxLinesOfCode: 150
+  maxDependencies: 0

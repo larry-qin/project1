@@ -1,0 +1,82 @@
+version: "1.0.0"
+generatedBy: "edp-6-mcp"
+timestamp: "2025-09-28T15:30:00Z"
+originalIntent: "Implement multiplayer capabilities using Strategy 3: Hybrid Socket.IO + Free Cloud Platform"
+scope:
+  allowedPaths:
+    - "3d-demo.html"
+    - "multiplayer-client.js"
+  forbiddenPaths:
+    - "index.html"
+    - "about.html"
+    - "skills.html"
+    - "projects.html"
+    - "contact.html"
+    - "styles.css"
+    - "script.js"
+  newFiles:
+    - "server.js"
+    - "package.json"
+    - "multiplayer-client.js"
+    - "lobby.html"
+apiContracts:
+  - name: "joinRoom"
+    type: "function"
+    params:
+      - name: "roomId"
+        type: "string"
+      - name: "playerName"
+        type: "string"
+    returns: "void"
+    required: true
+  - name: "sendPlayerUpdate"
+    type: "function"
+    params:
+      - name: "position"
+        type: "object"
+      - name: "rotation"
+        type: "object"
+    returns: "void"
+    required: true
+  - name: "sendShootEvent"
+    type: "function"
+    params:
+      - name: "origin"
+        type: "object"
+      - name: "direction"
+        type: "object"
+    returns: "void"
+    required: true
+acceptanceCriteria:
+  - id: "AC-001"
+    description: "Multiple players can join same room"
+    given: "Server is running and accessible"
+    when: "Players navigate to lobby page and join room"
+    then: "All players appear in same game instance"
+  - id: "AC-002"
+    description: "Real-time player movement synchronization"
+    given: "Multiple players in same room"
+    when: "One player moves using WASD controls"
+    then: "Other players see movement in real-time"
+  - id: "AC-003"
+    description: "Shooting events are synchronized"
+    given: "Multiple players in same room"
+    when: "One player shoots weapon"
+    then: "Other players see muzzle flash and bullet effects"
+  - id: "AC-004"
+    description: "Server deploys to free cloud platform"
+    given: "Server code is complete"
+    when: "Deploy to Railway/Glitch platform"
+    then: "Server is accessible via public URL"
+nonGoals:
+  - "Advanced anti-cheat systems"
+  - "Voice chat or text messaging"
+  - "Spectator mode or replays"
+  - "Complex matchmaking algorithms"
+  - "Leaderboards or statistics tracking"
+  - "Mobile-specific optimizations"
+complexityBudget:
+  maxNewFunctions: 15
+  maxNewFiles: 4
+  maxLinesOfCode: 800
+  maxDependencies: 3

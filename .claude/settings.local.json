@@ -1,11 +1,18 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "mcp__ctedp6__do_dis",
+      "mcp__ctedp6__do_ide",
+      "mcp__ctedp6__do_pla",
+      "mcp__ctedp6__do_bld",
+      "mcp__ctedp6__do_tst",
+      "Bash(python:*)"
+    ]
+  },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "ctedp6"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(git add:*)"
-    ]
-  }
+  ]
 }
