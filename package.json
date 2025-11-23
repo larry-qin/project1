@@ -1,15 +1,20 @@
 {
-  "name": "3d-multiplayer-game",
+  "name": "multiplayer-platformer",
   "version": "1.0.0",
-  "description": "3D FPS multiplayer game server",
+  "description": "2D multiplayer platformer game with CI/CD",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node tests/platformer.test.js",
+    "lint": "eslint *.js --ignore-pattern node_modules/"
   },
   "dependencies": {
     "express": "^4.18.0",
     "socket.io": "^4.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   },
   "engines": {
     "node": ">=16.0.0"

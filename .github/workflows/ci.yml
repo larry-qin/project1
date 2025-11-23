@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, branch1 ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+
+    - name: Validate JavaScript syntax
+      run: |
+        echo "Validating JavaScript files..."
+        node -c server.js
+        node -c platformer-game.js
+        node -c platformer-client.js
+        echo "✓ All JavaScript files have valid syntax"
+
+    - name: Check for security vulnerabilities
+      run: npm audit --audit-level=moderate || true
+
+    - name: Build validation summary
+      run: |
+        echo "================================"
+        echo "CI/CD Build Validation Summary"
+        echo "================================"
+        echo "✓ Dependencies installed"
+        echo "✓ Linting passed"
+        echo "✓ Tests passed"
+        echo "✓ Syntax validation passed"
+        echo "✓ Security audit completed"
+        echo "================================"

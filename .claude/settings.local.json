@@ -8,7 +8,21 @@
       "mcp__ctedp6__do_pla",
       "mcp__ctedp6__do_bld",
       "mcp__ctedp6__do_tst",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(npm install)",
+      "Bash(npm start)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(node:*)",
+      "Bash(start \"\" \"C:\\Users\\blaze\\Documents\\GitHub\\project1\\3d-demo.html\")",
+      "Bash(start http://localhost:3001/lobby.html)",
+      "Bash(start http://localhost:3001/3d-demo.html)",
+      "Bash(dir \"C:\\Users\\blaze\\Documents\\GitHub\\project1\\raccoon.jpg\")",
+      "Bash(del about.html skills.html projects.html contact.html PRD.html platformer.html)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -12,7 +12,7 @@ const io = socketIo(server, {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Serve static files
 app.use(express.static(path.join(__dirname)));
@@ -61,6 +61,11 @@ function removePlayerFromRoom(playerId) {
 io.on('connection', (socket) => {
     console.log(`Player connected: ${socket.id}`);
 
+    // Debug: Log all events
+    socket.onAny((eventName, ...args) => {
+        console.log(`Event received: ${eventName}`, args);
+    });
+
     // Handle room joining
     socket.on('joinRoom', (data) => {
         const { roomId, playerName } = data;
@@ -69,6 +74,9 @@ io.on('connection', (socket) => {
         // Create or get room
         const room = createRoom(roomId);
 
+        // Check if this is the first player (room host)
+        const isHost = room.players.size === 0;
+
         // Add player to room and maps
         const playerData = {
             id: playerId,
@@ -76,7 +84,8 @@ io.on('connection', (socket) => {
             roomId: roomId,
             position: { x: 0, y: 1.6, z: 0 },
             rotation: { yaw: 0, pitch: 0 },
-            weapon: 'pistol'
+            weapon: 'pistol',
+            isHost: isHost
         };
 
         room.players.set(playerId, playerData);
@@ -129,6 +138,93 @@ io.on('connection', (socket) => {
                 origin: data.origin,
                 direction: data.direction,
                 weapon: data.weapon
+            });
+        }
+    });
+
+    // Handle enemy updates from host
+    socket.on('enemyUpdate', (data) => {
+        const player = players.get(socket.id);
+        if (player && player.isHost) {
+            // Only host can update enemies
+            socket.to(player.roomId).emit('enemyUpdate', data);
+        }
+    });
+
+    // Handle player hit events (PvP)
+    socket.on('playerHit', (data) => {
+        const { targetPlayerId, damage, shooterPosition } = data;
+        const shooter = players.get(socket.id);
+
+        if (shooter) {
+            // Send hit event to the target player
+            io.to(targetPlayerId).emit('playerHit', {
+                shooterId: socket.id,
+                shooterName: shooter.name,
+                damage: damage,
+                shooterPosition: shooterPosition
+            });
+
+            console.log(`${shooter.name} hit player ${targetPlayerId} for ${damage} damage`);
+        }
+    });
+
+    // Platformer game events
+    socket.on('joinPlatformer', (data) => {
+        const { roomId, playerData } = data;
+        const playerId = socket.id;
+
+        // Create or get room
+        const room = createRoom(roomId);
+
+        // Add player to room
+        const platformerPlayer = {
+            id: playerId,
+            roomId: roomId,
+            ...playerData
+        };
+
+        room.players.set(playerId, platformerPlayer);
+        players.set(playerId, platformerPlayer);
+
+        // Join socket room
+        socket.join(roomId);
+
+        // Send existing players to new player
+        const existingPlayers = Array.from(room.players.values())
+            .filter(p => p.id !== playerId);
+
+        for (let existingPlayer of existingPlayers) {
+            socket.emit('playerJoined', {
+                playerId: existingPlayer.id,
+                playerData: {
+                    x: existingPlayer.x,
+                    y: existingPlayer.y,
+                    color: existingPlayer.color
+                }
+            });
+        }
+
+        // Broadcast new player to existing players
+        socket.to(roomId).emit('playerJoined', {
+            playerId: playerId,
+            playerData: playerData
+        });
+
+        console.log(`Player ${playerId} joined platformer room ${roomId}`);
+    });
+
+    socket.on('playerMove', (data) => {
+        const player = players.get(socket.id);
+        if (player && player.roomId) {
+            // Update player position
+            player.x = data.position.x;
+            player.y = data.position.y;
+
+            // Broadcast to other players in room
+            socket.to(player.roomId).emit('playerMoved', {
+                playerId: socket.id,
+                position: data.position
             });
         }
     });

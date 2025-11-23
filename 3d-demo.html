@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Maze - John Doe Portfolio</title>
+    <title>Horror Maze - Escape the Raccoon</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .demo-container {
@@ -308,6 +308,157 @@
             justify-content: center;
         }
 
+        .cicd-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .cicd-modal {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            color: white;
+            font-family: monospace;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(100, 255, 218, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: floatIn 0.4s ease-out forwards;
+        }
+
+        .cicd-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 1rem;
+        }
+
+        .cicd-header h2 {
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .cicd-checklist {
+            margin: 1.5rem 0;
+        }
+
+        .cicd-test-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: rgba(var(--accent-rgb), 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
+        }
+
+        .cicd-test-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            background: #333;
+            border: 2px solid #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .cicd-test-status.pending {
+            background: #333;
+            border-color: #666;
+        }
+
+        .cicd-test-status.pass {
+            background: #22c55e;
+            border-color: #16a34a;
+        }
+
+        .cicd-test-status.fail {
+            background: #ef4444;
+            border-color: #dc2626;
+        }
+
+        .cicd-test-name {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .cicd-results {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .cicd-results.success {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .cicd-results.failure {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .cicd-results-details {
+            margin-top: 0.75rem;
+            font-size: 14px;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        .cicd-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .run-test-btn {
+            background: linear-gradient(145deg, var(--accent-color), rgba(100, 255, 218, 0.8));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+            margin-right: 0.5rem;
+        }
+
+        .run-test-btn:hover {
+            background: linear-gradient(145deg, rgba(100, 255, 218, 0.9), var(--accent-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+        }
+
+        .run-test-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .control-btn {
             padding: 0.5rem 1rem;
             background: var(--accent-color);
@@ -379,11 +530,7 @@
             <div class="nav-container">
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="skills.html">Skills</a></li>
-                    <li><a href="projects.html">Projects</a></li>
                     <li><a href="3d-demo.html" class="active">3D Demo</a></li>
-                    <li><a href="contact.html">Contact</a></li>
                 </ul>
                 <div class="theme-switcher">
                     <button id="theme-toggle" class="theme-btn">🎨</button>
@@ -401,17 +548,21 @@
     <main>
         <div class="demo-container">
             <div class="demo-title">
-                <h1>3D Room with 2D Pistol</h1>
-                <p>Walk around and shoot with a 2D pistol overlay</p>
+                <h1>HORROR MAZE - Escape the Raccoon</h1>
+                <p>Navigate the dark maze and survive. The raccoon is hunting you...</p>
             </div>
 
             <div id="canvas-container">
                 <div class="game-ui">
                     <div>Position: <span id="position">0, 0</span></div>
+                    <div>Health: <span id="player-health" style="color: #22c55e; font-weight: bold;">100</span></div>
+                    <div>Raccoon Kills: <span id="raccoon-kills" style="color: #ff4444; font-weight: bold;">0</span></div>
+                    <div>Monster HP: <span id="monster-health" style="color: #ff8800; font-weight: bold;">100</span></div>
                     <div>Shots: <span id="shots">0</span></div>
                     <div>Hits: <span id="hits">0</span></div>
                     <div>Accuracy: <span id="accuracy">0%</span></div>
                 </div>
+
                 <div id="click-to-play" class="click-to-play">
                     <h3>🎮 Click to Start</h3>
                     <p>Click anywhere to enable mouse look</p>
@@ -469,6 +620,64 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- World Generation Settings Modal -->
+                <div id="worldgen-overlay" class="help-overlay" style="display: none;">
+                    <div class="help-modal" style="max-width: 600px;">
+                        <div class="help-header">
+                            <h2>🌍 World Generation Settings</h2>
+                            <p>Customize the procedural maze generation</p>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(var(--accent-rgb), 0.1); border-radius: 8px; border: 1px solid var(--accent-color);">
+                                <h3 style="color: var(--accent-color); margin-top: 0;">Seed</h3>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <input type="text" id="world-seed-input" style="flex: 1; padding: 0.5rem; font-family: monospace; font-size: 14px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-background); color: white;">
+                                    <button class="control-btn" onclick="copyWorldSeed()" style="padding: 0.5rem 1rem;">Copy</button>
+                                    <button class="control-btn" onclick="randomizeWorldSeed()" style="padding: 0.5rem 1rem;">Random</button>
+                                </div>
+                                <p style="font-size: 12px; margin: 0; opacity: 0.8;">Use the same seed to generate identical worlds</p>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <h3 style="color: var(--accent-color);">Wall Generation</h3>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Wall Count: <span id="wall-count-value">40</span>
+                                    <input type="range" id="wall-count" min="10" max="100" value="40" style="width: 100%;" oninput="document.getElementById('wall-count-value').textContent = this.value">
+                                </label>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Min Wall Length: <span id="min-wall-value">5</span>
+                                    <input type="range" id="min-wall-length" min="3" max="20" value="5" style="width: 100%;" oninput="document.getElementById('min-wall-value').textContent = this.value">
+                                </label>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Max Wall Length: <span id="max-wall-value">30</span>
+                                    <input type="range" id="max-wall-length" min="10" max="50" value="30" style="width: 100%;" oninput="document.getElementById('max-wall-value').textContent = this.value">
+                                </label>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <h3 style="color: var(--accent-color);">Obstacle Generation</h3>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Obstacle Count: <span id="obstacle-count-value">10</span>
+                                    <input type="range" id="obstacle-count" min="0" max="50" value="10" style="width: 100%;" oninput="document.getElementById('obstacle-count-value').textContent = this.value">
+                                </label>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Min Obstacle Size: <span id="min-obstacle-value">1</span>
+                                    <input type="range" id="min-obstacle-size" min="0.5" max="3" step="0.5" value="1" style="width: 100%;" oninput="document.getElementById('min-obstacle-value').textContent = this.value">
+                                </label>
+                                <label style="display: block; margin-bottom: 0.5rem;">
+                                    Max Obstacle Size: <span id="max-obstacle-value">4</span>
+                                    <input type="range" id="max-obstacle-size" min="2" max="8" step="0.5" value="4" style="width: 100%;" oninput="document.getElementById('max-obstacle-value').textContent = this.value">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="help-footer">
+                            <button class="close-btn" onclick="applyWorldGenSettings()" style="margin-right: 0.5rem;">Apply & Regenerate</button>
+                            <button class="control-btn" onclick="hideWorldGen()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="crosshair" id="crosshair"></div>
                 <div class="pistol-2d" id="weapon-display">
                     <!-- Pistol -->
@@ -493,11 +702,58 @@
 
             <div class="controls">
                 <button class="control-btn" id="new-maze">Reset Room</button>
+                <button class="control-btn" id="worldgen-btn">World Generation</button>
                 <button class="control-btn" id="toggle-minimap">Toggle Minimap</button>
                 <button class="control-btn" id="reset-position">Reset Position</button>
                 <button class="control-btn" id="toggle-fog">Toggle Fog</button>
                 <button class="control-btn" id="fullscreen-btn">Fullscreen</button>
                 <button class="control-btn" id="help-btn">? Help</button>
+                <button class="control-btn" id="cicd-btn">CI/CD Tests</button>
+            </div>
+
+            <!-- CI/CD Test Panel -->
+            <div id="cicd-overlay" class="cicd-overlay" style="display: none;">
+                <div class="cicd-modal">
+                    <div class="cicd-header">
+                        <h2>🔧 CI/CD Test Suite</h2>
+                        <p>Validate game functionality before deployment</p>
+                    </div>
+                    <div class="cicd-checklist">
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-shooting-status"></div>
+                            <div class="cicd-test-name">Shooting Mechanics</div>
+                        </div>
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-multiplayer-status"></div>
+                            <div class="cicd-test-name">Multiplayer System</div>
+                        </div>
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-pvp-status"></div>
+                            <div class="cicd-test-name">PvP Combat (HP System)</div>
+                        </div>
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-enemy-status"></div>
+                            <div class="cicd-test-name">Single Enemy (PvE)</div>
+                        </div>
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-3d-status"></div>
+                            <div class="cicd-test-name">3D Mechanics</div>
+                        </div>
+                        <div class="cicd-test-item">
+                            <div class="cicd-test-status pending" id="test-spike-status"></div>
+                            <div class="cicd-test-name">Spike System (Valorant)</div>
+                        </div>
+                    </div>
+                    <div id="cicd-results" class="cicd-results">
+                        <div id="cicd-results-message"></div>
+                        <div id="cicd-results-details" class="cicd-results-details"></div>
+                    </div>
+                    <div class="cicd-footer">
+                        <button class="run-test-btn" id="run-tests-btn">Run Tests</button>
+                        <button class="close-btn" onclick="hideCICDPanel()">Close</button>
+                        <p style="margin-top: 1rem; font-size: 12px; color: #888;">Play the game first, then run tests to validate functionality</p>
+                    </div>
+                </div>
             </div>
 
             <div class="demo-info">
@@ -549,10 +805,17 @@
         let wallHeight = 3;
         let minimapVisible = true;
         let fogEnabled = true;
+        let playerLight; // Flashlight attached to player
+        let raccoonChasers = []; // Array of horror nextbots chasing the player
+        let totalKillCount = 0; // Total kills across all raccoons
 
         // Shooting variables
         let shotsFired = 0;
         let shotsHit = 0;
+
+        // Player health (PvP system)
+        let playerHealth = 100;
+        const maxPlayerHealth = 100;
 
         // Weapon system
         let currentWeapon = 'pistol'; // 'pistol' or 'rifle'
@@ -562,18 +825,224 @@
         let recoilRecoveryTimer = null;
 
         // Enemy variables
-        let enemyCount = 5;
+        let enemyCount = 0; // No dummy enemies, only the raccoon chaser!
         let enemySpeed = 0.02; // Increased speed for more visible movement
 
         // Multiplayer variables
         let networkPlayers = new Map(); // Store network player meshes
         let isMultiplayer = false;
         let playerName = null;
+        let multiplayerClient = null;
+        let isHost = false;
 
         // Camera controls
         let yaw = 0; // Horizontal rotation
         let pitch = 0; // Vertical rotation
         const maxPitch = Math.PI / 3; // Limit looking up/down
+
+        // Jump mechanics
+        let isJumping = false;
+        let verticalVelocity = 0;
+        const jumpStrength = 0.15;
+        const gravity = 0.008;
+        const groundLevel = 1.6; // Camera height when on ground
+
+        // Procedural generation parameters
+        let worldSeed = Math.floor(Math.random() * 1000000);
+        let generationParams = {
+            roomSize: 100,
+            wallCount: 40,
+            minWallLength: 5,
+            maxWallLength: 30,
+            obstacleCount: 10,
+            minObstacleSize: 1,
+            maxObstacleSize: 4
+        };
+
+
+        // Sound effects (using Web Audio API)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playShootSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function playJumpSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + 0.15);
+
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+        }
+
+        function playHitSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.2);
+
+            gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+
+
+        // Seeded random number generator
+        class SeededRandom {
+            constructor(seed) {
+                this.seed = seed;
+            }
+
+            random() {
+                const x = Math.sin(this.seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            randomRange(min, max) {
+                return min + this.random() * (max - min);
+            }
+
+            randomInt(min, max) {
+                return Math.floor(this.randomRange(min, max + 1));
+            }
+        }
+
+        // Check if two rectangles overlap (with margin)
+        function rectanglesOverlap(rect1, rect2, margin = 0.5) {
+            const x1Min = rect1.x - rect1.w / 2 - margin;
+            const x1Max = rect1.x + rect1.w / 2 + margin;
+            const z1Min = rect1.z - rect1.d / 2 - margin;
+            const z1Max = rect1.z + rect1.d / 2 + margin;
+
+            const x2Min = rect2.x - rect2.w / 2 - margin;
+            const x2Max = rect2.x + rect2.w / 2 + margin;
+            const z2Min = rect2.z - rect2.d / 2 - margin;
+            const z2Max = rect2.z + rect2.d / 2 + margin;
+
+            return !(x1Max < x2Min || x1Min > x2Max || z1Max < z2Min || z1Min > z2Max);
+        }
+
+        // Generate procedural maze walls with overlap prevention
+        function generateProceduralWalls(seed, params) {
+            const rng = new SeededRandom(seed);
+            const walls = [];
+            const roomBound = params.roomSize / 2 - 5;
+            const maxAttempts = params.wallCount * 10; // Try up to 10x the wall count
+            let attempts = 0;
+
+            // Generate random walls without overlaps
+            while (walls.length < params.wallCount && attempts < maxAttempts) {
+                attempts++;
+
+                const isHorizontal = rng.random() > 0.5;
+                const length = rng.randomRange(params.minWallLength, params.maxWallLength);
+                const thickness = 1;
+
+                const x = rng.randomRange(-roomBound, roomBound);
+                const z = rng.randomRange(-roomBound, roomBound);
+
+                const newWall = isHorizontal
+                    ? { x, z, w: length, h: wallHeight, d: thickness }
+                    : { x, z, w: thickness, h: wallHeight, d: length };
+
+                // Check if this wall overlaps with any existing wall
+                let overlaps = false;
+                for (const existingWall of walls) {
+                    if (rectanglesOverlap(newWall, existingWall)) {
+                        overlaps = true;
+                        break;
+                    }
+                }
+
+                // Only add the wall if it doesn't overlap
+                if (!overlaps) {
+                    walls.push(newWall);
+                }
+            }
+
+            console.log(`Generated ${walls.length} non-overlapping walls (attempted ${attempts} times)`);
+            return walls;
+        }
+
+        // Generate procedural obstacles with overlap prevention
+        function generateProceduralObstacles(seed, params, existingWalls = []) {
+            const rng = new SeededRandom(seed + 999999); // Different seed offset for obstacles
+            const obstacles = [];
+            const roomBound = params.roomSize / 2 - 10;
+            const maxAttempts = params.obstacleCount * 10;
+            let attempts = 0;
+
+            while (obstacles.length < params.obstacleCount && attempts < maxAttempts) {
+                attempts++;
+
+                const width = rng.randomRange(params.minObstacleSize, params.maxObstacleSize);
+                const depth = rng.randomRange(params.minObstacleSize, params.maxObstacleSize);
+                const height = rng.randomRange(0.5, 2);
+
+                const x = rng.randomRange(-roomBound, roomBound);
+                const z = rng.randomRange(-roomBound, roomBound);
+
+                // Avoid spawning near player start (0, 0)
+                if (Math.abs(x) < 5 && Math.abs(z) < 5) continue;
+
+                const newObstacle = { x, z, w: width, h: height, d: depth, width, depth, height };
+
+                // Check if this obstacle overlaps with any existing wall
+                let overlaps = false;
+                for (const wall of existingWalls) {
+                    if (rectanglesOverlap(newObstacle, wall)) {
+                        overlaps = true;
+                        break;
+                    }
+                }
+
+                // Check if this obstacle overlaps with any existing obstacle
+                if (!overlaps) {
+                    for (const existingObstacle of obstacles) {
+                        if (rectanglesOverlap(newObstacle, existingObstacle)) {
+                            overlaps = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Only add the obstacle if it doesn't overlap
+                if (!overlaps) {
+                    obstacles.push({ x, z, width, depth, height });
+                }
+            }
+
+            console.log(`Generated ${obstacles.length} non-overlapping obstacles (attempted ${attempts} times)`);
+            return obstacles;
+        }
 
         // Create a simple room with four walls
         function createRoom() {
@@ -586,8 +1055,8 @@
 
                 roomGroup = new THREE.Group();
 
-            // Room dimensions
-            const roomSize = 20;
+            // Room dimensions - MUCH BIGGER MAZE for horror experience
+            const roomSize = 100;
             const wallThickness = 1;
 
             // Create wall texture
@@ -596,12 +1065,12 @@
             wallCanvas.width = 256;
             wallCanvas.height = 256;
 
-            // Create brick pattern
-            wallCtx.fillStyle = '#8B4513';
+            // Create darker brick pattern for horror atmosphere
+            wallCtx.fillStyle = '#2a1810'; // Much darker brown
             wallCtx.fillRect(0, 0, 256, 256);
 
             // Draw brick lines
-            wallCtx.strokeStyle = '#654321';
+            wallCtx.strokeStyle = '#1a0a05'; // Nearly black
             wallCtx.lineWidth = 2;
             for (let i = 0; i < 256; i += 32) {
                 wallCtx.beginPath();
@@ -634,12 +1103,12 @@
             floorCanvas.width = 256;
             floorCanvas.height = 256;
 
-            // Create tile pattern
-            floorCtx.fillStyle = '#2F4F2F';
+            // Create darker tile pattern for horror
+            floorCtx.fillStyle = '#0f0f0f'; // Nearly black floor
             floorCtx.fillRect(0, 0, 256, 256);
 
             // Draw tile lines
-            floorCtx.strokeStyle = '#1F3F1F';
+            floorCtx.strokeStyle = '#050505'; // Pure black lines
             floorCtx.lineWidth = 1;
             for (let i = 0; i < 256; i += 64) {
                 floorCtx.beginPath();
@@ -820,6 +1289,46 @@
             additionalWall4.receiveShadow = true;
             roomGroup.add(additionalWall4);
 
+            // PROCEDURALLY GENERATE MAZE WALLS
+            const mazeWalls = generateProceduralWalls(worldSeed, generationParams);
+            console.log(`Generated ${mazeWalls.length} procedural walls with seed ${worldSeed}`);
+
+            mazeWalls.forEach((wallSpec, idx) => {
+                const mazeWall = new THREE.Mesh(
+                    new THREE.BoxGeometry(wallSpec.w, wallSpec.h, wallSpec.d),
+                    wallMaterial
+                );
+                mazeWall.position.set(wallSpec.x, wallSpec.h / 2, wallSpec.z);
+                mazeWall.castShadow = true;
+                mazeWall.receiveShadow = true;
+                roomGroup.add(mazeWall);
+            });
+
+            // PROCEDURALLY GENERATE OBSTACLES (pass walls to prevent overlap)
+            const proceduralObstacles = generateProceduralObstacles(worldSeed, generationParams, mazeWalls);
+            console.log(`Generated ${proceduralObstacles.length} procedural obstacles`);
+
+            // Create obstacle material
+            const obstacleMaterial = new THREE.MeshPhongMaterial({
+                color: 0x4a3520,
+                shininess: 10
+            });
+
+            proceduralObstacles.forEach((obsSpec, idx) => {
+                const obstacle = new THREE.Mesh(
+                    new THREE.BoxGeometry(obsSpec.width, obsSpec.height, obsSpec.depth),
+                    obstacleMaterial
+                );
+                obstacle.position.set(obsSpec.x, obsSpec.height / 2, obsSpec.z);
+                obstacle.castShadow = true;
+                obstacle.receiveShadow = true;
+                roomGroup.add(obstacle);
+            });
+
+            // Initialize collidable objects for collision detection
+            collidableObjects = generateCollidableObjects(worldSeed, generationParams);
+            console.log(`Generated ${collidableObjects.length} total collidable objects`);
+
             // Create multiple enemies (smaller and taller)
             enemies = [];
             for (let i = 0; i < enemyCount; i++) {
@@ -870,6 +1379,7 @@
 
                 // Add movement properties
                 enemy.userData = {
+                    id: `enemy_${i}`, // Unique ID for multiplayer sync
                     direction: Math.random() * Math.PI * 2, // Random initial direction
                     speed: enemySpeed * (0.8 + Math.random() * 0.7), // Increased speed range
                     changeDirectionTimer: Math.random() * 200, // Random direction change
@@ -883,6 +1393,113 @@
                 roomGroup.add(enemy);
             }
 
+            // Function to create a new raccoon
+            function createRaccoon(spawnX, spawnZ) {
+                try {
+                const raccoonGeometry = new THREE.PlaneGeometry(3, 3); // Bigger and scarier (increased from 2x2 to 3x3)
+
+                // Create a bright red fallback canvas texture FIRST
+                const fallbackCanvas = document.createElement('canvas');
+                fallbackCanvas.width = 256;
+                fallbackCanvas.height = 256;
+                const fallbackCtx = fallbackCanvas.getContext('2d');
+
+                // Draw a scary red face/silhouette
+                fallbackCtx.fillStyle = '#ff0000';
+                fallbackCtx.fillRect(0, 0, 256, 256);
+                fallbackCtx.fillStyle = '#ffffff';
+                fallbackCtx.font = 'bold 120px Arial';
+                fallbackCtx.textAlign = 'center';
+                fallbackCtx.textBaseline = 'middle';
+                fallbackCtx.fillText('👹', 128, 128);
+
+                const fallbackTexture = new THREE.CanvasTexture(fallbackCanvas);
+
+                // Use MeshBasicMaterial with fallback texture as default
+                const raccoonMaterial = new THREE.MeshBasicMaterial({
+                    map: fallbackTexture, // Start with fallback
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    opacity: 1.0,
+                    color: 0xffffff
+                });
+
+                const raccoonChaser = new THREE.Mesh(raccoonGeometry, raccoonMaterial);
+
+                // Try to load the raccoon image texture in the background
+                const textureLoader = new THREE.TextureLoader();
+                textureLoader.load(
+                    'racooon.png',
+                    function(texture) {
+                        console.log('Raccoon texture loaded successfully');
+                        raccoonChaser.material.map = texture;
+                        raccoonChaser.material.needsUpdate = true;
+                    },
+                    undefined,
+                    function(err) {
+                        console.log('Using fallback texture for raccoon (image not found)');
+                    }
+                );
+
+                // Spawn at specified location
+                raccoonChaser.position.set(spawnX, 1, spawnZ);
+                raccoonChaser.castShadow = false; // Don't cast shadow, we want it glowing
+
+                // Add a VERY bright point light to the raccoon to make it always visible
+                const raccoonLight = new THREE.PointLight(0xff4444, 5.0, 25);
+                // Increased intensity from 2.0 to 5.0, range from 10 to 25
+                raccoonLight.position.set(0, 0, 0);
+                raccoonChaser.add(raccoonLight); // Attach light to raccoon so it moves with it
+
+                raccoonChaser.userData = {
+                    speed: 0.038, // 5% slower than player (player: 0.04, raccoon: 0.038 - 95% speed)
+                    active: true,
+                    light: raccoonLight, // Store reference to light
+                    health: 100,
+                    maxHealth: 100,
+                    killCount: 0, // Track how many times raccoon has been defeated
+                    baseSpeed: 0.038,
+                    baseMaxHealth: 100
+                };
+
+                // Create health bar above raccoon
+                const healthBarWidth = 3;
+                const healthBarHeight = 0.3;
+                const healthBarGroup = new THREE.Group();
+
+                // Background (red)
+                const healthBgGeometry = new THREE.PlaneGeometry(healthBarWidth, healthBarHeight);
+                const healthBgMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+                const healthBg = new THREE.Mesh(healthBgGeometry, healthBgMaterial);
+                healthBarGroup.add(healthBg);
+
+                // Foreground (green) - shows current health
+                const healthFgGeometry = new THREE.PlaneGeometry(healthBarWidth, healthBarHeight);
+                const healthFgMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+                const healthFg = new THREE.Mesh(healthFgGeometry, healthFgMaterial);
+                healthFg.position.z = 0.01; // Slightly in front of background
+                healthBarGroup.add(healthFg);
+
+                // Position health bar above raccoon
+                healthBarGroup.position.y = 2.2; // Above the 3x3 sprite
+                raccoonChaser.add(healthBarGroup);
+
+                // Store reference to health bar
+                raccoonChaser.userData.healthBar = healthFg;
+                raccoonChaser.userData.healthBarGroup = healthBarGroup;
+
+                roomGroup.add(raccoonChaser);
+                raccoonChasers.push(raccoonChaser); // Add to array
+                console.log('Raccoon chaser created at position:', raccoonChaser.position);
+                return raccoonChaser;
+                } catch (error) {
+                    console.error('Error creating raccoon chaser:', error);
+                    return null;
+                }
+            }
+
+            // Create initial raccoon
+            createRaccoon(45, 45);
 
             scene.add(roomGroup);
 
@@ -897,9 +1514,61 @@
             }
         }
 
-        function checkCollision(newPosition) {
+        // Define all collidable objects with height information (dynamically generated)
+        let collidableObjects = [];
+
+        // Generate collidable objects from procedural data
+        function generateCollidableObjects(seed, params) {
+            const objects = [];
+
+            // Generate static cover boxes
+            objects.push(
+                { x: -6, z: -3, width: 2, depth: 2, height: 1.5, topY: 0.75 },
+                { x: 5, z: -5, width: 1.5, depth: 1.5, height: 1.2, topY: 0.6 },
+                { x: 3, z: 2, width: 4, depth: 0.5, height: 2, topY: 1 },
+                { x: -3, z: 5, width: 1, depth: 3, height: 0.8, topY: 0.4 }
+            );
+
+            // Generate static additional walls
+            objects.push(
+                { x: -2, z: -6, width: 6, depth: 1, height: 3, topY: 1.5 },
+                { x: 1, z: -4, width: 1, depth: 4, height: 3, topY: 1.5 },
+                { x: -4, z: 3, width: 8, depth: 1, height: 3, topY: 1.5 },
+                { x: 7, z: 6, width: 1, depth: 5, height: 3, topY: 1.5 }
+            );
+
+            // Add procedural maze walls
+            const mazeWalls = generateProceduralWalls(seed, params);
+            mazeWalls.forEach(wall => {
+                objects.push({
+                    x: wall.x,
+                    z: wall.z,
+                    width: wall.w,
+                    depth: wall.d,
+                    height: wall.h,
+                    topY: wall.h / 2
+                });
+            });
+
+            // Add procedural obstacles (pass walls to prevent overlap)
+            const obstacles = generateProceduralObstacles(seed, params, mazeWalls);
+            obstacles.forEach(obs => {
+                objects.push({
+                    x: obs.x,
+                    z: obs.z,
+                    width: obs.width,
+                    depth: obs.depth,
+                    height: obs.height,
+                    topY: obs.height / 2
+                });
+            });
+
+            return objects;
+        }
+
+        function checkCollision(newPosition, currentHeight = camera.position.y) {
             const margin = 0.4; // Reduced margin for better gap navigation
-            const roomBounds = 8.8; // Tighter room boundary to prevent phasing
+            const roomBounds = 48.5; // Updated for 100-unit room (was 8.8 for 20-unit room)
 
             // Check room boundary collision with proper wall thickness
             if (Math.abs(newPosition.x) > roomBounds || Math.abs(newPosition.z) > roomBounds) {
@@ -907,29 +1576,31 @@
             }
 
             // Check collision with all interior walls and cover objects
-            const wallCollisions = [
-                // Cover boxes
-                { x: -6, z: -3, width: 2, depth: 2 }, // Cover box 1
-                { x: 5, z: -5, width: 1.5, depth: 1.5 }, // Cover box 2
-                { x: 3, z: 2, width: 4, depth: 0.5 }, // Cover wall
-                { x: -3, z: 5, width: 1, depth: 3 }, // Cover box 3
+            // Only block if object is taller than player's current height
+            for (const obj of collidableObjects) {
+                const halfWidth = obj.width / 2 + margin;
+                const halfDepth = obj.depth / 2 + margin;
 
-                // Additional walls
-                { x: -2, z: -6, width: 6, depth: 1 }, // Additional wall 1
-                { x: 1, z: -4, width: 1, depth: 4 }, // Additional wall 2
-                { x: -4, z: 3, width: 8, depth: 1 }, // Additional wall 3
-                { x: 7, z: 6, width: 1, depth: 5 } // Additional wall 4
-            ];
+                if (newPosition.x >= obj.x - halfWidth &&
+                    newPosition.x <= obj.x + halfWidth &&
+                    newPosition.z >= obj.z - halfDepth &&
+                    newPosition.z <= obj.z + halfDepth) {
 
-            for (const wall of wallCollisions) {
-                const halfWidth = wall.width / 2 + margin;
-                const halfDepth = wall.depth / 2 + margin;
+                    // Allow walking on top of short objects (cover boxes)
+                    // Block only if object is taller than camera or if camera is below object top
+                    const objectTopHeight = obj.topY + groundLevel;
+                    const playerHeight = currentHeight;
 
-                if (newPosition.x >= wall.x - halfWidth &&
-                    newPosition.x <= wall.x + halfWidth &&
-                    newPosition.z >= wall.z - halfDepth &&
-                    newPosition.z <= wall.z + halfDepth) {
-                    return true;
+                    // If player is above the object, allow movement
+                    if (playerHeight >= objectTopHeight - 0.2) {
+                        // Player is on top or high enough, don't block
+                        continue;
+                    }
+
+                    // Block collision for tall walls and when player is below object
+                    if (obj.height >= 2.0 || playerHeight < objectTopHeight - 0.2) {
+                        return true;
+                    }
                 }
             }
 
@@ -950,12 +1621,37 @@
             return false;
         }
 
+        function getGroundLevelAt(x, z) {
+            const margin = 0.3; // Smaller margin for standing on objects
+            let maxHeight = 0; // Floor level
+
+            // Check each collidable object
+            for (const obj of collidableObjects) {
+                const halfWidth = obj.width / 2 + margin;
+                const halfDepth = obj.depth / 2 + margin;
+
+                // Check if player is standing on this object
+                if (x >= obj.x - halfWidth &&
+                    x <= obj.x + halfWidth &&
+                    z >= obj.z - halfDepth &&
+                    z <= obj.z + halfDepth) {
+                    // Player is above this object
+                    maxHeight = Math.max(maxHeight, obj.topY);
+                }
+            }
+
+            return maxHeight;
+        }
+
         function shoot() {
             shotsFired++;
             console.log('Shot fired! Total shots:', shotsFired);
 
+            // Play shooting sound
+            playShootSound();
+
             // Send multiplayer shoot event
-            if (isMultiplayer && multiplayerClient.isMultiplayerActive()) {
+            if (isMultiplayer && multiplayerClient && multiplayerClient.isMultiplayerActive()) {
                 multiplayerClient.sendShootEvent(
                     camera.position,
                     { yaw: yaw, pitch: pitch },
@@ -998,50 +1694,114 @@
                 }, 200);
             }
 
-            // Check for hit using raycaster against all living enemies
+            // Check for hit using raycaster against enemies AND network players
             raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+            // Collect all shootable targets
             const livingEnemies = enemies.filter(enemy => enemy.userData.alive);
-            const intersects = raycaster.intersectObjects(livingEnemies, false);
+            const networkPlayerMeshes = Array.from(networkPlayers.values())
+                .map(player => player.mesh)
+                .filter(mesh => mesh !== null && mesh !== undefined);
+
+            // Add all raccoons to shootable targets
+            const shootableTargets = [...livingEnemies, ...networkPlayerMeshes];
+            raccoonChasers.forEach(raccoon => {
+                if (raccoon && raccoon.userData.active && raccoon.userData.health > 0) {
+                    shootableTargets.push(raccoon);
+                }
+            });
+
+            const allTargets = shootableTargets;
+            const intersects = raycaster.intersectObjects(allTargets, false);
 
             let isHit = false;
             if (intersects.length > 0) {
-                const hitEnemy = intersects[0].object;
-                shotsHit++;
-                isHit = true;
-                console.log('Enemy hit! Total hits:', shotsHit);
+                const hitObject = intersects[0].object;
 
-                // Mark enemy as dead and start fall animation
-                hitEnemy.userData.alive = false;
-                hitEnemy.material.color.setRGB(0.3, 0.3, 0.3); // Grey out dead enemy
-                hitEnemy.material.opacity = 0.7;
+                // Check if hit any raccoon
+                const hitRaccoon = raccoonChasers.find(r => r === hitObject);
+                if (hitRaccoon) {
+                    shotsHit++;
+                    isHit = true;
 
-                // Fall over animation
-                const fallDuration = 800;
-                const startRotation = hitEnemy.rotation.x;
-                const startTime = Date.now();
+                    // Determine damage based on weapon
+                    const damage = currentWeapon === 'rifle' ? 15 : 25; // Rifle does less damage per shot, pistol more
+                    hitRaccoon.userData.health -= damage;
 
-                const animateFall = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / fallDuration, 1);
+                    console.log(`Raccoon hit! Damage: ${damage}, Health: ${hitRaccoon.userData.health}/${hitRaccoon.userData.maxHealth}`);
 
-                    // Ease out animation
-                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    // Play hit sound
+                    playHitSound();
 
-                    hitEnemy.rotation.x = startRotation + (Math.PI / 2) * easeOut;
-                    hitEnemy.position.y = 0.8 * (1 - easeOut * 0.9); // Fall down
+                    // Flash effect on raccoon
+                    const originalColor = hitRaccoon.material.color.clone();
+                    hitRaccoon.material.color.setRGB(1, 1, 1); // Flash white
+                    setTimeout(() => {
+                        if (hitRaccoon && hitRaccoon.material) {
+                            hitRaccoon.material.color.copy(originalColor);
+                        }
+                    }, 100);
+                }
+                // Check if hit an enemy
+                else if (livingEnemies.includes(hitObject)) {
+                    const hitEnemy = hitObject;
+                    shotsHit++;
+                    isHit = true;
+                    console.log('Enemy hit! Total hits:', shotsHit);
 
-                    if (progress < 1) {
-                        requestAnimationFrame(animateFall);
-                    } else {
-                        // Remove from scene after fall
-                        setTimeout(() => {
-                            roomGroup.remove(hitEnemy);
-                            const index = enemies.indexOf(hitEnemy);
-                            if (index > -1) enemies.splice(index, 1);
-                        }, 2000);
+                    // Mark enemy as dead and start fall animation
+                    hitEnemy.userData.alive = false;
+                    hitEnemy.material.color.setRGB(0.3, 0.3, 0.3); // Grey out dead enemy
+                    hitEnemy.material.opacity = 0.7;
+
+                    // Fall over animation
+                    const fallDuration = 800;
+                    const startRotation = hitEnemy.rotation.x;
+                    const startTime = Date.now();
+
+                    const animateFall = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / fallDuration, 1);
+
+                        // Ease out animation
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                        hitEnemy.rotation.x = startRotation + (Math.PI / 2) * easeOut;
+                        hitEnemy.position.y = 0.8 * (1 - easeOut * 0.9); // Fall down
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animateFall);
+                        } else {
+                            // Remove from scene after fall
+                            setTimeout(() => {
+                                roomGroup.remove(hitEnemy);
+                                const index = enemies.indexOf(hitEnemy);
+                                if (index > -1) enemies.splice(index, 1);
+                            }, 2000);
+                        }
+                    };
+                    animateFall();
+                }
+                // Check if hit a network player
+                else if (networkPlayerMeshes.includes(hitObject)) {
+                    shotsHit++;
+                    isHit = true;
+
+                    // Find which player was hit
+                    const hitPlayer = Array.from(networkPlayers.values())
+                        .find(p => p.mesh === hitObject);
+
+                    if (hitPlayer && isMultiplayer && multiplayerClient) {
+                        console.log(`Hit player: ${hitPlayer.name}`);
+
+                        // Send player hit event to server
+                        multiplayerClient.socket.emit('playerHit', {
+                            targetPlayerId: hitPlayer.id,
+                            damage: 40,
+                            shooterPosition: camera.position
+                        });
                     }
-                };
-                animateFall();
+                }
             }
 
             // Create bullet path visualization
@@ -1113,7 +1873,7 @@
                 return;
             }
 
-            const roomSize = 20;
+            const roomSize = 100; // Updated for larger maze (was 20)
             const scale = 200 / roomSize;
             const centerOffset = 100; // Center the room in the minimap
 
@@ -1130,7 +1890,7 @@
                 roomSize * scale
             );
 
-            // Draw walls
+            // Draw outer walls
             ctx.fillStyle = '#8B4513';
             const wallThickness = 3;
 
@@ -1143,21 +1903,24 @@
             // East wall
             ctx.fillRect(centerOffset + (roomSize / 2) * scale - wallThickness, centerOffset - (roomSize / 2) * scale, wallThickness, roomSize * scale);
 
-            // Draw enemies on minimap
-            enemies.forEach(enemy => {
-                if (enemy.userData.alive) {
-                    ctx.fillStyle = '#FF0000';
-                    ctx.beginPath();
-                    ctx.arc(
-                        centerOffset + enemy.position.x * scale,
-                        centerOffset + enemy.position.z * scale,
-                        3,
-                        0,
-                        2 * Math.PI
-                    );
-                    ctx.fill();
-                }
+            // Draw interior walls and obstacles
+            ctx.fillStyle = '#654321'; // Slightly different color for interior walls
+            collidableObjects.forEach(obj => {
+                const x = centerOffset + (obj.x - obj.width / 2) * scale;
+                const z = centerOffset + (obj.z - obj.depth / 2) * scale;
+                const w = obj.width * scale;
+                const d = obj.depth * scale;
+
+                // Draw walls/obstacles as rectangles
+                ctx.fillRect(x, z, w, d);
+
+                // Add border for better visibility
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x, z, w, d);
             });
+
+            // Raccoons are NOT shown on minimap - adds to the horror!
 
             // Draw player
             ctx.fillStyle = '#0080FF';
@@ -1186,10 +1949,48 @@
             ctx.stroke();
         }
 
+        function takeDamage(damage) {
+            playerHealth -= damage;
+            if (playerHealth < 0) playerHealth = 0;
+
+            console.log(`Took ${damage} damage! Health: ${playerHealth}`);
+
+            // Play hit sound
+            playHitSound();
+
+            // Visual feedback - flash red
+            const healthElement = document.getElementById('player-health');
+            healthElement.style.textShadow = '0 0 10px #ef4444';
+            setTimeout(() => {
+                healthElement.style.textShadow = 'none';
+            }, 200);
+        }
+
         function updateUI() {
             const posX = Math.floor(camera.position.x);
             const posZ = Math.floor(camera.position.z);
             document.getElementById('position').textContent = `${posX}, ${posZ}`;
+
+            // Update health with color coding
+            const healthElement = document.getElementById('player-health');
+            healthElement.textContent = playerHealth;
+            if (playerHealth > 60) {
+                healthElement.style.color = '#22c55e'; // Green
+            } else if (playerHealth > 30) {
+                healthElement.style.color = '#ffc107'; // Yellow
+            } else {
+                healthElement.style.color = '#ef4444'; // Red
+            }
+
+            // Update raccoon stats
+            document.getElementById('raccoon-kills').textContent = totalKillCount;
+
+            // Show combined health of all raccoons
+            if (raccoonChasers.length > 0) {
+                const totalHealth = raccoonChasers.reduce((sum, r) => sum + Math.max(0, r.userData.health || 0), 0);
+                const totalMaxHealth = raccoonChasers.reduce((sum, r) => sum + (r.userData.maxHealth || 0), 0);
+                document.getElementById('monster-health').textContent = `${totalHealth}/${totalMaxHealth} (${raccoonChasers.length}x)`;
+            }
 
             // Update shooting stats
             document.getElementById('shots').textContent = shotsFired;
@@ -1200,12 +2001,12 @@
 
         function init() {
             try {
-                // Create scene
+                // Create scene - DARK HORROR ATMOSPHERE
                 scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x87CEEB);
+                scene.background = new THREE.Color(0x0a0a0a); // Almost black
 
-                // Add fog
-                scene.fog = new THREE.Fog(0x87CEEB, 1, 50);
+                // Add thick dark fog for horror atmosphere
+                scene.fog = new THREE.FogExp2(0x000000, 0.05); // Dense exponential fog
 
                 // Create camera
                 const container = document.getElementById('canvas-container');
@@ -1223,44 +2024,43 @@
                 raycaster = new THREE.Raycaster();
 
 
-                // Add dramatic lighting
-                const ambientLight = new THREE.AmbientLight(0x202040, 0.3); // Darker, bluer ambient
+                // HORROR GAME LIGHTING - Very dark and ominous
+                const ambientLight = new THREE.AmbientLight(0x0a0a15, 0.15); // Extremely dark ambient
                 scene.add(ambientLight);
 
-                // Main directional light (sun)
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                // Dim moonlight effect
+                const directionalLight = new THREE.DirectionalLight(0x1a1a3a, 0.2);
                 directionalLight.position.set(15, 25, 10);
                 directionalLight.castShadow = true;
                 directionalLight.shadow.mapSize.width = 4096;
                 directionalLight.shadow.mapSize.height = 4096;
                 directionalLight.shadow.camera.near = 0.5;
-                directionalLight.shadow.camera.far = 60;
-                directionalLight.shadow.camera.left = -30;
-                directionalLight.shadow.camera.right = 30;
-                directionalLight.shadow.camera.top = 30;
-                directionalLight.shadow.camera.bottom = -30;
+                directionalLight.shadow.camera.far = 200;
+                directionalLight.shadow.camera.left = -100;
+                directionalLight.shadow.camera.right = 100;
+                directionalLight.shadow.camera.top = 100;
+                directionalLight.shadow.camera.bottom = -100;
                 directionalLight.shadow.bias = -0.0001;
                 scene.add(directionalLight);
 
-                // Add dramatic rim lighting
-                const rimLight1 = new THREE.DirectionalLight(0xff6600, 0.6); // Orange rim
-                rimLight1.position.set(-20, 10, -15);
-                scene.add(rimLight1);
+                // Player flashlight - attached to camera (BRIGHTER for better visibility)
+                playerLight = new THREE.SpotLight(0xffffdd, 3.5, 50, Math.PI / 5, 0.3, 1.5);
+                // Parameters: color, intensity (1.5 -> 3.5), distance (30 -> 50), angle, penumbra, decay
+                playerLight.position.set(0, 1.6, 0);
+                playerLight.castShadow = true;
+                playerLight.shadow.mapSize.width = 2048;
+                playerLight.shadow.mapSize.height = 2048;
+                scene.add(playerLight);
+                scene.add(playerLight.target); // Add target to scene so it can be updated
 
-                const rimLight2 = new THREE.DirectionalLight(0x0066ff, 0.4); // Blue rim
-                rimLight2.position.set(20, 8, 15);
-                scene.add(rimLight2);
+                // Eerie flickering lights scattered around
+                const flickerLight1 = new THREE.PointLight(0x330000, 0.5, 15);
+                flickerLight1.position.set(-30, 3, -30);
+                scene.add(flickerLight1);
 
-                // Add point lights for dramatic effect
-                const pointLight1 = new THREE.PointLight(0xffaa00, 1.0, 20);
-                pointLight1.position.set(-8, 4, -8);
-                pointLight1.castShadow = true;
-                scene.add(pointLight1);
-
-                const pointLight2 = new THREE.PointLight(0x00aaff, 0.8, 15);
-                pointLight2.position.set(8, 3, 8);
-                pointLight2.castShadow = true;
-                scene.add(pointLight2);
+                const flickerLight2 = new THREE.PointLight(0x003300, 0.4, 12);
+                flickerLight2.position.set(30, 3, 30);
+                scene.add(flickerLight2);
 
                 // Generate initial room
                 createRoom();
@@ -1334,10 +2134,31 @@
 
             document.getElementById('help-btn').addEventListener('click', showHelp);
 
+            // World generation settings button
+            document.getElementById('worldgen-btn').addEventListener('click', showWorldGen);
+
             // Add click-outside-to-close for help overlay
             document.getElementById('help-overlay').addEventListener('click', (e) => {
                 if (e.target.id === 'help-overlay') {
                     hideHelp();
+                }
+            });
+
+            // Add click-outside-to-close for worldgen overlay
+            document.getElementById('worldgen-overlay').addEventListener('click', (e) => {
+                if (e.target.id === 'worldgen-overlay') {
+                    hideWorldGen();
+                }
+            });
+
+            // CI/CD test panel controls
+            document.getElementById('cicd-btn').addEventListener('click', showCICDPanel);
+            document.getElementById('run-tests-btn').addEventListener('click', runCICDTests);
+
+            // Add click-outside-to-close for CI/CD overlay
+            document.getElementById('cicd-overlay').addEventListener('click', (e) => {
+                if (e.target.id === 'cicd-overlay') {
+                    hideCICDPanel();
                 }
             });
         }
@@ -1357,6 +2178,59 @@
             } else {
                 showHelp();
             }
+        }
+
+        // World Generation UI functions
+        function showWorldGen() {
+            // Update UI with current values
+            document.getElementById('world-seed-input').value = worldSeed;
+            document.getElementById('wall-count').value = generationParams.wallCount;
+            document.getElementById('wall-count-value').textContent = generationParams.wallCount;
+            document.getElementById('min-wall-length').value = generationParams.minWallLength;
+            document.getElementById('min-wall-value').textContent = generationParams.minWallLength;
+            document.getElementById('max-wall-length').value = generationParams.maxWallLength;
+            document.getElementById('max-wall-value').textContent = generationParams.maxWallLength;
+            document.getElementById('obstacle-count').value = generationParams.obstacleCount;
+            document.getElementById('obstacle-count-value').textContent = generationParams.obstacleCount;
+            document.getElementById('min-obstacle-size').value = generationParams.minObstacleSize;
+            document.getElementById('min-obstacle-value').textContent = generationParams.minObstacleSize;
+            document.getElementById('max-obstacle-size').value = generationParams.maxObstacleSize;
+            document.getElementById('max-obstacle-value').textContent = generationParams.maxObstacleSize;
+
+            document.getElementById('worldgen-overlay').style.display = 'flex';
+        }
+
+        function hideWorldGen() {
+            document.getElementById('worldgen-overlay').style.display = 'none';
+        }
+
+        function copyWorldSeed() {
+            const seedInput = document.getElementById('world-seed-input');
+            seedInput.select();
+            document.execCommand('copy');
+            alert(`Seed ${seedInput.value} copied to clipboard!`);
+        }
+
+        function randomizeWorldSeed() {
+            const newSeed = Math.floor(Math.random() * 1000000);
+            document.getElementById('world-seed-input').value = newSeed;
+        }
+
+        function applyWorldGenSettings() {
+            // Get values from UI
+            worldSeed = parseInt(document.getElementById('world-seed-input').value) || Math.floor(Math.random() * 1000000);
+            generationParams.wallCount = parseInt(document.getElementById('wall-count').value);
+            generationParams.minWallLength = parseInt(document.getElementById('min-wall-length').value);
+            generationParams.maxWallLength = parseInt(document.getElementById('max-wall-length').value);
+            generationParams.obstacleCount = parseInt(document.getElementById('obstacle-count').value);
+            generationParams.minObstacleSize = parseFloat(document.getElementById('min-obstacle-size').value);
+            generationParams.maxObstacleSize = parseFloat(document.getElementById('max-obstacle-size').value);
+
+            console.log('Applying new world generation settings:', { worldSeed, generationParams });
+
+            // Regenerate the world
+            hideWorldGen();
+            createRoom();
         }
 
         function switchWeapon(weaponType) {
@@ -1525,6 +2399,15 @@
                     case 'ArrowRight':
                         moveRight = true;
                         break;
+                    case 'Space':
+                        // Jump - check current ground level at player position
+                        const playerGroundLevel = getGroundLevelAt(camera.position.x, camera.position.z) + groundLevel;
+                        if (!isJumping && camera.position.y <= playerGroundLevel + 0.1) {
+                            isJumping = true;
+                            verticalVelocity = jumpStrength;
+                            playJumpSound();
+                        }
+                        break;
                     case 'Escape':
                         if (document.getElementById('help-overlay').style.display === 'flex') {
                             hideHelp();
@@ -1579,6 +2462,24 @@
             // Movement speed
             const moveSpeed = 0.04;
 
+            // Apply gravity and jump physics
+            const currentGroundLevel = getGroundLevelAt(camera.position.x, camera.position.z) + groundLevel;
+
+            if (isJumping || camera.position.y > currentGroundLevel) {
+                verticalVelocity -= gravity;
+                camera.position.y += verticalVelocity;
+
+                // Check if landed on ground or object
+                if (camera.position.y <= currentGroundLevel) {
+                    camera.position.y = currentGroundLevel;
+                    verticalVelocity = 0;
+                    isJumping = false;
+                }
+            } else {
+                // Ensure player stays on ground/object when walking
+                camera.position.y = currentGroundLevel;
+            }
+
             // Calculate movement based on current yaw (horizontal rotation only)
             if (moveForward || moveBackward || moveLeft || moveRight) {
                 const movement = new THREE.Vector3(0, 0, 0);
@@ -1614,56 +2515,173 @@
                 const testPositionZ = camera.position.clone();
                 testPositionZ.z = newPosition.z;
 
-                if (!checkCollision(testPositionX)) {
+                if (!checkCollision(testPositionX, camera.position.y)) {
                     camera.position.x = newPosition.x;
                 }
 
-                if (!checkCollision(testPositionZ)) {
+                if (!checkCollision(testPositionZ, camera.position.y)) {
                     camera.position.z = newPosition.z;
                 }
             }
 
-            // Make all living enemies face the player and move
-            enemies.forEach((enemy, index) => {
-                if (enemy.userData.alive) {
-                    // Always face the player
-                    enemy.lookAt(camera.position);
+            // Make all living enemies face the player and move (only host controls enemies)
+            if (!isMultiplayer || isHost) {
+                let enemiesChanged = false;
 
-                    // Simple AI movement
-                    enemy.userData.changeDirectionTimer--;
-                    if (enemy.userData.changeDirectionTimer <= 0) {
-                        enemy.userData.direction = Math.random() * Math.PI * 2;
-                        enemy.userData.changeDirectionTimer = 100 + Math.random() * 200;
-                        if (frameCount % 300 === 0) { // Debug every 5 seconds
-                            console.log(`Enemy ${index + 1} changing direction to ${enemy.userData.direction}`);
+                enemies.forEach((enemy, index) => {
+                    if (enemy.userData.alive) {
+                        // Always face the player
+                        enemy.lookAt(camera.position);
+
+                        // Simple AI movement
+                        enemy.userData.changeDirectionTimer--;
+                        if (enemy.userData.changeDirectionTimer <= 0) {
+                            enemy.userData.direction = Math.random() * Math.PI * 2;
+                            enemy.userData.changeDirectionTimer = 100 + Math.random() * 200;
+                            enemiesChanged = true;
+                            if (frameCount % 300 === 0) { // Debug every 5 seconds
+                                console.log(`Enemy ${index + 1} changing direction to ${enemy.userData.direction}`);
+                            }
+                        }
+
+                        // Move enemy
+                        const moveX = Math.sin(enemy.userData.direction) * enemy.userData.speed;
+                        const moveZ = Math.cos(enemy.userData.direction) * enemy.userData.speed;
+
+                        const newPos = enemy.position.clone();
+                        newPos.x += moveX;
+                        newPos.z += moveZ;
+
+                        // Check collision for enemy movement
+                        if (!checkCollision(newPos)) {
+                            enemy.position.x = newPos.x;
+                            enemy.position.z = newPos.z;
+                            enemiesChanged = true;
+                        } else {
+                            // Bounce off walls and obstacles
+                            enemy.userData.direction += Math.PI + (Math.random() - 0.5) * 0.5;
+                            enemy.userData.changeDirectionTimer = 50; // Change direction soon
+                            enemiesChanged = true;
+                            if (frameCount % 300 === 0) { // Debug collision bounces
+                                console.log(`Enemy ${index + 1} bounced off obstacle`);
+                            }
+                        }
+                    }
+                });
+
+                // Send enemy updates to other players if host and something changed
+                if (isMultiplayer && isHost && enemiesChanged && frameCount % 10 === 0) { // Send updates every 10 frames
+                    if (multiplayerClient && multiplayerClient.isMultiplayerActive()) {
+                        multiplayerClient.sendEnemyUpdate(enemies);
+                    }
+                }
+            } else {
+                // Non-host clients: just make enemies face the player
+                enemies.forEach((enemy) => {
+                    if (enemy.userData.alive) {
+                        enemy.lookAt(camera.position);
+                    }
+                });
+            }
+
+            // RACCOON CHASERS AI - Loop through all raccoons
+            raccoonChasers.forEach((raccoonChaser, index) => {
+                if (raccoonChaser && raccoonChaser.userData.active) {
+                    // Make raccoon face the player
+                    raccoonChaser.lookAt(camera.position);
+
+                    // Make health bar face the player
+                    if (raccoonChaser.userData.healthBarGroup) {
+                        raccoonChaser.userData.healthBarGroup.lookAt(camera.position);
+                    }
+
+                    // Update health bar scale based on current health
+                    if (raccoonChaser.userData.healthBar) {
+                        const healthPercent = raccoonChaser.userData.health / raccoonChaser.userData.maxHealth;
+                        raccoonChaser.userData.healthBar.scale.x = healthPercent;
+                        raccoonChaser.userData.healthBar.position.x = -(3 * (1 - healthPercent)) / 2;
+
+                        // Change color based on health
+                        if (healthPercent > 0.6) {
+                            raccoonChaser.userData.healthBar.material.color.setHex(0x00ff00); // Green
+                        } else if (healthPercent > 0.3) {
+                            raccoonChaser.userData.healthBar.material.color.setHex(0xffff00); // Yellow
+                        } else {
+                            raccoonChaser.userData.healthBar.material.color.setHex(0xff8800); // Orange
                         }
                     }
 
-                    // Move enemy
-                    const moveX = Math.sin(enemy.userData.direction) * enemy.userData.speed;
-                    const moveZ = Math.cos(enemy.userData.direction) * enemy.userData.speed;
+                    // Check if raccoon is dead
+                    if (raccoonChaser.userData.health <= 0) {
+                        // Increment global kill counter
+                        totalKillCount++;
+                        raccoonChaser.userData.killCount++;
 
-                    const newPos = enemy.position.clone();
-                    newPos.x += moveX;
-                    newPos.z += moveZ;
+                        // Check if we should spawn a new raccoon (every 5 kills)
+                        if (totalKillCount % 5 === 0) {
+                            const roomBound = 40;
+                            const spawnX = (Math.random() - 0.5) * roomBound * 2;
+                            const spawnZ = (Math.random() - 0.5) * roomBound * 2;
+                            createRaccoon(spawnX, spawnZ);
+                            console.log(`MILESTONE! ${totalKillCount} kills - New raccoon spawned! Total raccoons: ${raccoonChasers.length}`);
+                        }
 
-                    // Check collision for enemy movement
-                    if (!checkCollision(newPos)) {
-                        enemy.position.x = newPos.x;
-                        enemy.position.z = newPos.z;
+                        // Increase max health by 25% each death (100 -> 125 -> 156 -> 195...)
+                        raccoonChaser.userData.maxHealth = Math.floor(raccoonChaser.userData.baseMaxHealth * Math.pow(1.25, raccoonChaser.userData.killCount));
+
+                        // Increase speed by 5% each death (0.038 -> 0.0399 -> 0.0419...)
+                        raccoonChaser.userData.speed = raccoonChaser.userData.baseSpeed * Math.pow(1.05, raccoonChaser.userData.killCount);
+
+                        // Respawn raccoon at random location
+                        const roomBound = 40;
+                        const newX = (Math.random() - 0.5) * roomBound * 2;
+                        const newZ = (Math.random() - 0.5) * roomBound * 2;
+                        raccoonChaser.position.set(newX, 1, newZ);
+
+                        // Reset health to new max
+                        raccoonChaser.userData.health = raccoonChaser.userData.maxHealth;
+
+                        console.log(`Raccoon #${index + 1} defeated! Total kills: ${totalKillCount}. Respawning at (${newX.toFixed(1)}, ${newZ.toFixed(1)})`);
+                        console.log(`New stats - Health: ${raccoonChaser.userData.maxHealth}, Speed: ${raccoonChaser.userData.speed.toFixed(4)}`);
                     } else {
-                        // Bounce off walls and obstacles
-                        enemy.userData.direction += Math.PI + (Math.random() - 0.5) * 0.5;
-                        enemy.userData.changeDirectionTimer = 50; // Change direction soon
-                        if (frameCount % 300 === 0) { // Debug collision bounces
-                            console.log(`Enemy ${index + 1} bounced off obstacle`);
+                        // Calculate direction to player
+                        const directionToPlayer = new THREE.Vector3();
+                        directionToPlayer.subVectors(camera.position, raccoonChaser.position);
+                        directionToPlayer.y = 0; // Keep movement horizontal
+                        directionToPlayer.normalize();
+
+                        // Move towards player (phases through walls for horror effect)
+                        const raccoonSpeed = raccoonChaser.userData.speed;
+                        raccoonChaser.position.x += directionToPlayer.x * raccoonSpeed;
+                        raccoonChaser.position.z += directionToPlayer.z * raccoonSpeed;
+
+                        // Check if raccoon caught the player (game over)
+                        const distanceToPlayer = raccoonChaser.position.distanceTo(camera.position);
+                        if (distanceToPlayer < 2) {
+                            // Player caught by raccoon!
+                            playerHealth = 0;
+                            updateHealthBar();
+                            console.log('GAME OVER: Caught by the raccoon!');
                         }
                     }
                 }
             });
 
+            // Update flashlight position and direction to follow camera
+            if (playerLight) {
+                playerLight.position.copy(camera.position);
+
+                // Get the camera's forward direction vector
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+
+                // Position the spotlight target in front of the camera
+                playerLight.target.position.copy(camera.position).add(direction.multiplyScalar(10));
+                playerLight.target.updateMatrixWorld();
+            }
+
             // Send multiplayer updates
-            if (isMultiplayer && multiplayerClient.isMultiplayerActive()) {
+            if (isMultiplayer && multiplayerClient && multiplayerClient.isMultiplayerActive()) {
                 multiplayerClient.sendPlayerUpdate(
                     camera.position,
                     { yaw: yaw, pitch: pitch },
@@ -1683,28 +2701,75 @@
         window.onNetworkPlayerJoined = function(player) {
             console.log(`Creating visual for network player: ${player.name}`);
 
-            // Create player mesh using enemy pattern
-            const playerGeometry = new THREE.PlaneGeometry(0.6, 1.6);
+            // Create stick figure player model
+            const playerGroup = new THREE.Group();
 
+            // Create stick figure using canvas (similar to your image)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 96;
             canvas.height = 256;
 
-            ctx.fillStyle = '#00AAFF'; // Blue color for network players
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0,0,0,0)';
             ctx.fillRect(0, 0, 96, 256);
+
+            // Draw stick figure
+            ctx.strokeStyle = '#00AAFF'; // Blue color for network players
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const centerX = 48;
+            const scale = 0.8;
+
+            // Head (circle)
+            ctx.beginPath();
+            ctx.arc(centerX, 40 * scale, 15 * scale, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Body (vertical line)
+            ctx.beginPath();
+            ctx.moveTo(centerX, 55 * scale);
+            ctx.lineTo(centerX, 140 * scale);
+            ctx.stroke();
+
+            // Arms (horizontal line)
+            ctx.beginPath();
+            ctx.moveTo(centerX - 20 * scale, 85 * scale);
+            ctx.lineTo(centerX + 20 * scale, 85 * scale);
+            ctx.stroke();
+
+            // Left leg
+            ctx.beginPath();
+            ctx.moveTo(centerX, 140 * scale);
+            ctx.lineTo(centerX - 15 * scale, 180 * scale);
+            ctx.stroke();
+
+            // Right leg
+            ctx.beginPath();
+            ctx.moveTo(centerX, 140 * scale);
+            ctx.lineTo(centerX + 15 * scale, 180 * scale);
+            ctx.stroke();
+
+            // Add player name
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '12px Arial';
+            ctx.font = 'bold 12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(player.name, 48, 130);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeText(player.name, centerX, 200);
+            ctx.fillText(player.name, centerX, 200);
 
             const texture = new THREE.CanvasTexture(canvas);
             const playerMaterial = new THREE.MeshPhongMaterial({
                 map: texture,
                 transparent: true,
-                side: THREE.DoubleSide
+                side: THREE.DoubleSide,
+                alphaTest: 0.1
             });
 
+            const playerGeometry = new THREE.PlaneGeometry(0.8, 1.6);
             const playerMesh = new THREE.Mesh(playerGeometry, playerMaterial);
             playerMesh.position.set(player.position.x, player.position.y, player.position.z);
             playerMesh.castShadow = true;
@@ -1735,6 +2800,184 @@
             networkPlayers.delete(player.id);
         };
 
+        // Host status callback
+        window.onHostStatusChanged = function(hostStatus) {
+            isHost = hostStatus;
+            console.log(`🎮 Host status: ${isHost ? 'HOST' : 'CLIENT'}`);
+        };
+
+        // Enemy update callback
+        window.onEnemyUpdate = function(data) {
+            if (isHost) return; // Host doesn't receive updates
+
+            console.log(`📡 Received enemy update:`, data);
+
+            // Update enemies based on host data
+            data.enemies.forEach(enemyData => {
+                const enemy = enemies.find(e => e.userData.id === enemyData.id);
+                if (enemy) {
+                    enemy.position.set(enemyData.position.x, enemyData.position.y, enemyData.position.z);
+                    enemy.userData.direction = enemyData.direction;
+                    enemy.userData.alive = enemyData.alive;
+
+                    if (!enemyData.alive && enemy.userData.alive) {
+                        // Enemy just died, trigger death animation
+                        enemy.userData.alive = false;
+                        enemy.material.color.setRGB(0.3, 0.3, 0.3);
+                        enemy.material.opacity = 0.7;
+                    }
+                }
+            });
+        };
+
+        // CI/CD Test Functions
+        function testShooting() {
+            // Test if shooting mechanics are functional
+            return shotsFired > 0;
+        }
+
+        function testMultiplayer() {
+            // Test if multiplayer system is initialized (exists and has socket capability)
+            return typeof multiplayerClient !== 'undefined' && multiplayerClient !== null;
+        }
+
+        function testEnemyInteraction() {
+            // Test if single enemy exists (PvP mode has only 1 enemy)
+            return enemies.length === 1 || (enemies.length >= 0 && shotsHit > 0);
+        }
+
+        function test3DMechanics() {
+            // Test if 3D mechanics are functional (scene, camera, renderer exist and working)
+            return typeof scene !== 'undefined' && scene !== null &&
+                   typeof camera !== 'undefined' && camera !== null &&
+                   typeof renderer !== 'undefined' && renderer !== null &&
+                   roomGroup !== null;
+        }
+
+        function testPvPCombat() {
+            // Test if PvP combat system is functional (HP system and multiplayer hit detection)
+            return typeof playerHealth !== 'undefined' &&
+                   playerHealth >= 0 &&
+                   playerHealth <= maxPlayerHealth &&
+                   typeof takeDamage === 'function';
+        }
+
+
+        function runCICDTests() {
+            // Reset all status indicators
+            document.getElementById('test-shooting-status').className = 'cicd-test-status pending';
+            document.getElementById('test-multiplayer-status').className = 'cicd-test-status pending';
+            document.getElementById('test-pvp-status').className = 'cicd-test-status pending';
+            document.getElementById('test-enemy-status').className = 'cicd-test-status pending';
+            document.getElementById('test-3d-status').className = 'cicd-test-status pending';
+            document.getElementById('test-shooting-status').textContent = '';
+            document.getElementById('test-multiplayer-status').textContent = '';
+            document.getElementById('test-pvp-status').textContent = '';
+            document.getElementById('test-enemy-status').textContent = '';
+            document.getElementById('test-3d-status').textContent = '';
+
+            // Run all tests
+            const results = {
+                shooting: testShooting(),
+                multiplayer: testMultiplayer(),
+                pvpCombat: testPvPCombat(),
+                enemyInteraction: testEnemyInteraction(),
+                mechanics3D: test3DMechanics()
+            };
+
+            // Update status indicators
+            if (results.shooting) {
+                document.getElementById('test-shooting-status').className = 'cicd-test-status pass';
+                document.getElementById('test-shooting-status').textContent = '✓';
+            } else {
+                document.getElementById('test-shooting-status').className = 'cicd-test-status fail';
+                document.getElementById('test-shooting-status').textContent = '✗';
+            }
+
+            if (results.multiplayer) {
+                document.getElementById('test-multiplayer-status').className = 'cicd-test-status pass';
+                document.getElementById('test-multiplayer-status').textContent = '✓';
+            } else {
+                document.getElementById('test-multiplayer-status').className = 'cicd-test-status fail';
+                document.getElementById('test-multiplayer-status').textContent = '✗';
+            }
+
+            if (results.pvpCombat) {
+                document.getElementById('test-pvp-status').className = 'cicd-test-status pass';
+                document.getElementById('test-pvp-status').textContent = '✓';
+            } else {
+                document.getElementById('test-pvp-status').className = 'cicd-test-status fail';
+                document.getElementById('test-pvp-status').textContent = '✗';
+            }
+
+            if (results.enemyInteraction) {
+                document.getElementById('test-enemy-status').className = 'cicd-test-status pass';
+                document.getElementById('test-enemy-status').textContent = '✓';
+            } else {
+                document.getElementById('test-enemy-status').className = 'cicd-test-status fail';
+                document.getElementById('test-enemy-status').textContent = '✗';
+            }
+
+            if (results.mechanics3D) {
+                document.getElementById('test-3d-status').className = 'cicd-test-status pass';
+                document.getElementById('test-3d-status').textContent = '✓';
+            } else {
+                document.getElementById('test-3d-status').className = 'cicd-test-status fail';
+                document.getElementById('test-3d-status').textContent = '✗';
+            }
+
+            // Display results
+            displayTestResults(results);
+        }
+
+        function displayTestResults(results) {
+            const allPassed = results.shooting && results.multiplayer && results.pvpCombat && results.enemyInteraction && results.mechanics3D && results.spikeMechanics;
+            const resultsDiv = document.getElementById('cicd-results');
+            const messageDiv = document.getElementById('cicd-results-message');
+            const detailsDiv = document.getElementById('cicd-results-details');
+
+            resultsDiv.style.display = 'block';
+
+            if (allPassed) {
+                resultsDiv.className = 'cicd-results success';
+                messageDiv.textContent = '✓ Tests succeeded';
+                detailsDiv.innerHTML = '<p>All game systems are operational and ready for deployment!</p>';
+            } else {
+                resultsDiv.className = 'cicd-results failure';
+                messageDiv.textContent = '✗ Tests failed';
+
+                const failures = [];
+                if (!results.shooting) {
+                    failures.push('• Shooting Mechanics: No shots fired. Try shooting with the pistol or rifle.');
+                }
+                if (!results.multiplayer) {
+                    failures.push('• Multiplayer System: Not initialized. Multiplayer client not found.');
+                }
+                if (!results.pvpCombat) {
+                    failures.push('• PvP Combat: HP system not initialized. Player health tracking unavailable.');
+                }
+                if (!results.enemyInteraction) {
+                    failures.push('• Single Enemy: Enemy not spawned. Expected exactly 1 enemy in PvP mode.');
+                }
+                if (!results.mechanics3D) {
+                    failures.push('• 3D Mechanics: Core 3D components missing or not initialized.');
+                }
+                if (!results.spikeMechanics) {
+                    failures.push('• Spike System: Valorant-style spike mechanics not initialized.');
+                }
+
+                detailsDiv.innerHTML = '<p><strong>Failed Tests:</strong></p>' + failures.map(f => `<p>${f}</p>`).join('');
+            }
+        }
+
+        function showCICDPanel() {
+            document.getElementById('cicd-overlay').style.display = 'flex';
+        }
+
+        function hideCICDPanel() {
+            document.getElementById('cicd-overlay').style.display = 'none';
+        }
+
         // Initialize when page loads
         window.addEventListener('load', () => {
             init();
@@ -1747,9 +2990,35 @@
             if (roomId && playerNameParam) {
                 isMultiplayer = true;
                 playerName = playerNameParam;
+                multiplayerClient = new MultiplayerClient();
+
+                console.log(`Setting up multiplayer for room: ${roomId} as ${playerName}`);
+
+                // Connect and wait for connection before joining room
                 multiplayerClient.connect();
-                multiplayerClient.joinRoom(roomId, playerName);
-                console.log(`Joining multiplayer room: ${roomId} as ${playerName}`);
+
+                // Listen for player hit events
+                multiplayerClient.socket.on('playerHit', (data) => {
+                    console.log(`Hit by ${data.shooterName} for ${data.damage} damage!`);
+                    takeDamage(data.damage);
+                });
+
+                // Wait for connection, then join room
+                setTimeout(() => {
+                    if (multiplayerClient.isConnected) {
+                        console.log('Connected! Joining room...');
+                        multiplayerClient.joinRoom(roomId, playerName);
+                    } else {
+                        console.log('Not connected yet, retrying...');
+                        setTimeout(() => {
+                            if (multiplayerClient.isConnected) {
+                                multiplayerClient.joinRoom(roomId, playerName);
+                            } else {
+                                console.error('Failed to connect to multiplayer server');
+                            }
+                        }, 1000);
+                    }
+                }, 500);
             }
         });
     </script>

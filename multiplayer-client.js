@@ -37,16 +37,25 @@ class MultiplayerClient {
         this.socket.on('roomJoined', (data) => {
             this.playerId = data.playerId;
             this.roomId = data.roomId;
-            console.log(`Joined room ${this.roomId} as ${this.playerId}`);
+            this.isHost = data.existingPlayers.length === 0; // Host if no existing players
+            console.log(`✅ Joined room ${this.roomId} as ${this.playerId}`);
+            console.log(`✅ Is host: ${this.isHost}`);
+            console.log(`✅ Existing players:`, data.existingPlayers);
+
+            // Notify game about host status
+            if (window.onHostStatusChanged) {
+                window.onHostStatusChanged(this.isHost);
+            }
 
             // Add existing players to game
             data.existingPlayers.forEach(player => {
+                console.log(`✅ Adding existing player:`, player);
                 this.addNetworkPlayer(player);
             });
         });
 
         this.socket.on('playerJoined', (playerData) => {
-            console.log(`Player ${playerData.name} joined`);
+            console.log(`✅ Player ${playerData.name} joined:`, playerData);
             this.addNetworkPlayer(playerData);
         });
 
@@ -61,6 +70,13 @@ class MultiplayerClient {
 
         this.socket.on('playerShoot', (data) => {
             this.handleNetworkPlayerShoot(data);
+        });
+
+        this.socket.on('enemyUpdate', (data) => {
+            // Update enemy positions from host
+            if (window.onEnemyUpdate) {
+                window.onEnemyUpdate(data);
+            }
         });
     }
 
@@ -109,9 +125,32 @@ class MultiplayerClient {
         });
     }
 
+    // Send enemy update (only for host)
+    sendEnemyUpdate(enemies) {
+        if (!this.isConnected || !this.roomId) return;
+
+        const enemyData = enemies.map(enemy => ({
+            id: enemy.userData.id,
+            position: {
+                x: enemy.position.x,
+                y: enemy.position.y,
+                z: enemy.position.z
+            },
+            direction: enemy.userData.direction,
+            alive: enemy.userData.alive
+        }));
+
+        this.socket.emit('enemyUpdate', { enemies: enemyData });
+    }
+
     // Add network player to game
     addNetworkPlayer(playerData) {
-        if (playerData.id === this.playerId) return;
+        if (playerData.id === this.playerId) {
+            console.log(`❌ Skipping self player: ${playerData.id}`);
+            return;
+        }
+
+        console.log(`🔥 Creating network player:`, playerData);
 
         // Create player entity using existing enemy system patterns
         const player = {
@@ -124,10 +163,14 @@ class MultiplayerClient {
         };
 
         this.networkPlayers.set(playerData.id, player);
+        console.log(`🔥 Network players map now contains:`, Array.from(this.networkPlayers.keys()));
 
         // Trigger game to create visual representation
         if (window.onNetworkPlayerJoined) {
+            console.log(`🔥 Calling onNetworkPlayerJoined callback`);
             window.onNetworkPlayerJoined(player);
+        } else {
+            console.log(`❌ No onNetworkPlayerJoined callback found!`);
         }
     }
 
@@ -192,5 +235,4 @@ class MultiplayerClient {
     }
 }
 
-// Global multiplayer client instance
-window.multiplayerClient = new MultiplayerClient();
+// MultiplayerClient class is available globally
